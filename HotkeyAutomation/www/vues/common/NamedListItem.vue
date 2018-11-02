@@ -1,0 +1,306 @@
+﻿<template>
+	<div :class="{ itemRoot: true, deleting: deleting, working: working, isHotkey: isHotkey }">
+		<div class="topRow">
+			<input class="name" type="text" v-model="item.name" :placeholder="('Name this ' + itemType + '…')" @change="edit" />
+			<label v-if="!isHotkey">
+				Host:
+				<input class="host" type="text" v-model="item.host" placeholder="192.168.x.x" @change="edit" />
+			</label>
+			<label v-if="!isHotkey && includePort">
+				Port:
+				<input class="port" type="number" v-model.number="item.port" min="1" max="65535" :placeholder="portPlaceholder" @change="edit" />
+			</label>
+			<span v-if="isHotkey" title="Bind new key"><svg @click="hotkeyListen"><use xlink:href="#input"></use></svg></span>
+			<span v-if="isHotkey" class="keyReadout">{{item.keyName}}</span>
+			<div class="buttons">
+				<ScaleLoader :class="{ scaleLoader: true, visible: working }"></ScaleLoader>
+				<span title="Drag me!" class="listItem_dragHandle"><svg><use xlink:href="#arrows"></use></svg></span>
+				<span :title="('Delete this ' + itemType)"><svg @click="removeClick"><use xlink:href="#remove"></use></svg></span>
+			</div>
+		</div>
+		<div v-if="isHotkey">
+			<draggable v-model="item.effects" @change="itemsChanged" :options="{ handle: '.hotkeyEffect_dragHandle' }">
+				<HotkeyEffect v-for="(effect, index) in item.effects" :key="index" :effect="effect" class="hotkeyEffect" @edit="edit" @delete="deleteEffect" />
+			</draggable>
+		</div>
+		<input v-if="isHotkey" type="button" value="Add Effect" @click="addEffect" class="addEffect" />
+	</div>
+</template>
+
+<script>
+	import svg1 from 'appRoot/images/sprite/remove.svg';
+	import svg2 from 'appRoot/images/sprite/input.svg';
+	import svg3 from 'appRoot/images/sprite/arrows.svg';
+	import { ModalHotkeyListener } from 'appRoot/scripts/Dialogs.js';
+	import HotkeyEffect from 'appRoot/vues/hotkeys/HotkeyEffect.vue';
+	import { Effect } from 'appRoot/scripts/EffectData.js';
+	import draggable from 'vuedraggable';
+
+	export default {
+		components: { HotkeyEffect, draggable },
+		props:
+		{
+			item: {
+				type: Object,
+				required: true
+			},
+			itemType: {
+				type: String,
+				required: true
+			},
+			apiKey: {
+				type: String,
+				required: true
+			},
+			includePort: {
+				type: Boolean,
+				default: false
+			},
+			portPlaceholder: {
+				type: String,
+				default: "Port"
+			}
+		},
+		data()
+		{
+			return {
+				working: false,
+				deleting: false
+			};
+		},
+		computed:
+		{
+			isHotkey()
+			{
+				return this.apiKey === "hotkey";
+			},
+			undoItems()
+			{
+				let component = this;
+				while (component.$parent)
+				{
+					component = component.$parent;
+					if (component.undoItems)
+						return component.undoItems;
+				}
+				toaster.error("Could not find a list of undo items in the ancestor components");
+				return [];
+			}
+		},
+		methods:
+		{
+			hotkeyListen()
+			{
+				ModalHotkeyListener(this.item.id).then(result =>
+				{
+					if (result)
+					{
+						this.item.key = result.key;
+						this.item.keyName = result.keyName;
+					}
+				});
+			},
+			removeClick()
+			{
+				this.working = true;
+				this.deleting = true;
+				this.$emit("delete", this.item);
+			},
+			resetState()
+			{
+				this.working = false;
+				this.deleting = false;
+			},
+			edit()
+			{
+				this.working = true;
+				this.$emit("edit", this.item);
+			},
+			addEffect()
+			{
+				if (!this.item.effects)
+					this.item.effects = [];
+				this.item.effects.push(new Effect());
+				this.edit();
+			},
+			deleteEffect(effect)
+			{
+				let idxKey = this.item.effects.indexOf(effect);
+				if (idxKey > -1)
+					this.item.effects.splice(idxKey, 1);
+				this.edit();
+				this.setupUndoDelete(effect);
+			},
+			setupUndoDelete(effect)
+			{
+				let undoItem = {};
+				undoItem.deletedItem = effect;
+				undoItem.description = "Deleted effect";
+				undoItem.undo = () =>
+				{
+					this.undoDelete(undoItem);
+				};
+				undoItem.expire = 6;
+				undoItem.expireTimeout = setTimeout(() =>
+				{
+					this.expireUndoItem(undoItem);
+				}, 6000);
+				this.undoItems.push(undoItem);
+			},
+			undoDelete(undoItem)
+			{
+				undoItem.expire = 0;
+				clearTimeout(undoItem.expireTimeout);
+				undoItem.expireTimeout = null;
+				this.expireUndoItem(undoItem);
+				this.item.effects.push(undoItem.deletedItem);
+				this.edit();
+			},
+			expireUndoItem(undoItem)
+			{
+				clearTimeout(undoItem.expireTimeout);
+				let idxUndoItem = this.undoItems.indexOf(undoItem);
+				if (idxUndoItem > -1)
+					this.undoItems.splice(idxUndoItem, 1);
+			},
+			itemsChanged(arg)
+			{
+				if (arg.moved)
+				{
+					this.edit();
+				}
+			}
+		},
+		created()
+		{
+		}
+	};
+</script>
+
+<style scoped>
+	.itemRoot
+	{
+		border-bottom: 1px solid #bfbfbf;
+		padding: 1px 5px;
+		overflow: hidden;
+	}
+
+		.itemRoot:last-child
+		{
+			border-bottom: none;
+		}
+
+		.itemRoot.deleting
+		{
+			filter: blur(2px);
+		}
+
+		.itemRoot.working
+		{
+			background-color: rgba(0,0,0,0.05);
+		}
+
+		.itemRoot.isHotkey
+		{
+			padding-top: 8px;
+			padding-bottom: 8px;
+			background-color: rgba(0,0,0,0.05);
+		}
+
+			.itemRoot.isHotkey:last-child
+			{
+				padding-bottom: 1px;
+				margin-bottom: 0px;
+			}
+
+			.itemRoot.isHotkey:first-child
+			{
+				padding-top: 1px;
+			}
+
+			.itemRoot.isHotkey.working
+			{
+				background-color: rgba(0,0,0,0.1);
+			}
+
+	.topRow
+	{
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.name
+	{
+		width: 250px;
+		padding-left: 3px;
+		margin: 5px 0px;
+	}
+
+	svg
+	{
+		min-width: 40px;
+		min-height: 40px;
+		width: 40px;
+		height: 40px;
+		cursor: pointer;
+		user-select: none;
+		margin-left: 5px;
+		border: 1px solid #CCCCCC;
+		border-radius: 7px;
+		background-color: rgba(0,0,0,0.1);
+		fill: #000000;
+		box-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+	}
+
+		svg:hover
+		{
+			background-color: rgba(0,0,0,0.05);
+		}
+
+		svg:active
+		{
+			background-color: #FFFFFF;
+		}
+
+	label
+	{
+		margin-bottom: 0px; /* Bootstrap sure is opinionated */
+		margin-left: 5px;
+	}
+
+	.keyReadout
+	{
+		flex: 1 1 auto;
+		margin-left: 9px;
+	}
+
+	.buttons
+	{
+		display: flex;
+		align-items: center;
+	}
+
+	.scaleLoader
+	{
+		opacity: 0;
+	}
+
+		.scaleLoader.visible
+		{
+			opacity: 1;
+		}
+
+	.hotkeyEffect,
+	.addEffect
+	{
+		margin: 3px 0px 10px 0px;
+	}
+
+		.listItem_dragHandle svg
+		{
+			transform: rotate(90deg);
+			box-shadow: 1px -1px 3px rgba(0,0,0,0.5);
+		}
+</style>
