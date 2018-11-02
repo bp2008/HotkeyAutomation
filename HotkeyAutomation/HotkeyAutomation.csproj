@@ -72,6 +72,7 @@
     <None Include="iTachCommands.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="package-lock.json" />
     <None Include="package.json" />
     <None Include="packages.config" />
     <None Include="www\jsconfig.json" />
@@ -98,7 +99,9 @@
     <None Include="www\vues\vera\VeraListItem.vue" />
     <None Include="www\vues\vera\VeraList.vue" />
     <None Include="Z_NpmInstall.bat" />
+    <None Include="Z_NpmPrune.bat" />
     <None Include="Z_WebpackBuild.bat" />
+    <None Include="Z_WebpackDevServer.bat" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="webpack.config.js" />
