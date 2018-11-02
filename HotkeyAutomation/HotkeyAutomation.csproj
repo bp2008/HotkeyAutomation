@@ -105,6 +105,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="webpack.config.js" />
+    <Content Include="www\images\sprite\arrows.svg" />
     <Content Include="www\scripts\EffectData.js" />
     <None Include="www\404.html" />
     <None Include="www\api\api.js" />
@@ -141,9 +142,16 @@
   <ItemGroup>
     <Folder Include="www\styles\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\BPUtil\BPUtil\BPUtil.csproj">
+      <Project>{a4981d8d-debf-4b34-b9ce-ff25520a02b7}</Project>
+      <Name>BPUtil</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>cd "$(ProjectDir)"
-node "$(ProjectDir)node_modules\webpack\bin\webpack"</PostBuildEvent>
+node "$(ProjectDir)node_modules\webpack\bin\webpack"
+xcopy "$(ProjectDir)www" "$(TargetDir)www" /E /C /R /Y /I /Q</PostBuildEvent>
   </PropertyGroup>
 </Project>

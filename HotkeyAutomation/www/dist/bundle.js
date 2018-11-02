@@ -1621,7 +1621,8 @@ exports.default = {
 			nextLine: -1,
 			logId: -1,
 			error: false,
-			isLogScrolledToBottom: true
+			isLogScrolledToBottom: true,
+			isClosing: false
 		};
 	},
 
@@ -1629,6 +1630,7 @@ exports.default = {
 		Refresh: function Refresh() {
 			var _this = this;
 
+			if (this.isClosing) return;
 			(0, _api.ExecJSON)({ cmd: "log_get", nextLine: this.nextLine, logId: this.logId }).then(function (data) {
 				if (data.status === "OK") {
 					_this.error = false;
@@ -1674,6 +1676,9 @@ exports.default = {
 	},
 	mounted: function mounted() {
 		this.Refresh();
+	},
+	beforeDestroy: function beforeDestroy() {
+		this.isClosing = true;
 	}
 }; //
 //
