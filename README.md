@@ -18,3 +18,7 @@ chmod u+x HotkeyAutomation_Install.sh
 ```
 
 The installation script will ask if you wish to install or uninstall.  Once installed, HotkeyAutomation will start automatically upon booting to the desktop.
+
+### Configuration
+
+Navigate a web browser to the IP address of your raspberry pi.  The HotkeyAutomation program has a built-in web server which listens by default on port 80.
