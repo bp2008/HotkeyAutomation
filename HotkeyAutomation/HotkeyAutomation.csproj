@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="HotkeyAutomation_Install.sh" />
     <None Include="iTachCommands.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
