@@ -1,4 +1,5 @@
 ﻿using System;
+using BPUtil;
 
 namespace HotkeyAutomation.HotkeyProcessing
 {
@@ -11,7 +12,7 @@ namespace HotkeyAutomation.HotkeyProcessing
 			{
 				if (key == null)
 					return "unset";
-				return ((ConsoleKey)key).ToString();
+				return ConsoleKeyHelper.GetKeyName(key.Value);
 			}
 		}
 		public Effect[] effects;

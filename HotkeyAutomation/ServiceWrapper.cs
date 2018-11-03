@@ -24,13 +24,7 @@ namespace HotkeyAutomation
 		{
 			Globals.Initialize(System.Reflection.Assembly.GetExecutingAssembly().Location);
 			Directory.SetCurrentDirectory(Globals.ApplicationDirectoryBase);
-			if (Environment.UserInteractive)
-			{
-				Logger.logType = LoggingMode.Console | LoggingMode.File;
-				Logger.Info("User-interactive environment detected. Logging to console is enabled.");
-			}
-			else
-				Logger.logType = LoggingMode.File;
+			Logger.logType = LoggingMode.Console | LoggingMode.File;
 
 			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 

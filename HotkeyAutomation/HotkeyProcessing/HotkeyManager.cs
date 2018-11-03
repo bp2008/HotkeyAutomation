@@ -33,17 +33,17 @@ namespace HotkeyAutomation.HotkeyProcessing
 		/// </summary>
 		/// <param name="key">A ConsoleKey value.</param>
 		/// <returns></returns>
-		public void NotifyKeyPressed(ConsoleKey key)
+		public void NotifyKeyPressed(int key)
 		{
 			try
 			{
-				if (HandlePossibleKeybind((int)key))
+				if (HandlePossibleKeybind(key))
 					return;
-				TriggerHotkeys((int)key);
+				TriggerHotkeys(key);
 			}
 			catch (Exception ex)
 			{
-				Logger.Debug(ex, "Handling key " + key);
+				Logger.Debug(ex, "Handling key " + ConsoleKeyHelper.GetKeyName(key));
 			}
 		}
 		/// <summary>
@@ -174,7 +174,7 @@ namespace HotkeyAutomation.HotkeyProcessing
 				BindState state = GetCurrentBindState();
 				if (state == null)
 					return false;
-				Logger.Info("[" + _bindState.bindId + "] Hotkey Bind - SET KEY " + (ConsoleKey)key);
+				Logger.Info("[" + _bindState.bindId + "] Hotkey Bind - SET KEY " + ConsoleKeyHelper.GetKeyName(key));
 				_bindState = null;
 				return ServiceWrapper.config.SetHotkeyKey(state.hotkeyId, key) != null;
 			}
