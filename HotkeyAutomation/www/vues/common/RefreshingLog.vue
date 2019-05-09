@@ -15,7 +15,8 @@
 				logId: -1,
 				error: false,
 				isLogScrolledToBottom: true,
-				isClosing: false
+				isClosing: false,
+				cancelLogRefresh: () => { }
 			};
 		},
 		methods:
@@ -24,7 +25,9 @@
 			{
 				if (this.isClosing)
 					return;
-				ExecJSON({ cmd: "log_get", nextLine: this.nextLine, logId: this.logId }).then(data =>
+				let apiPromise = ExecJSON({ cmd: "log_get", nextLine: this.nextLine, logId: this.logId });
+				this.cancelLogRefresh = apiPromise.cancelRequest;
+				apiPromise.then(data =>
 				{
 					if (data.status === "OK")
 					{
@@ -57,26 +60,34 @@
 				).catch(err =>
 				{
 					this.error = true;
-					toaster.error("Error retrieving log data (retry in 10s)", err, 30000);
-					setTimeout(() =>
-					{
-						this.Refresh();
-					}, 10000);
+					if (err.code !== DOMException.ABORT_ERR)
+						toaster.error("Error retrieving log data (retry in 10s)", err, 30000);
+					if (!this.isClosing)
+						setTimeout(() =>
+						{
+							this.Refresh();
+						}, 10000);
 				});
 			},
 			AddLine(line)
 			{
+				if (!this.$refs.refreshingLog)
+					return;
 				let ele = document.createElement("div");
 				ele.innerText = line;
 				this.$refs.refreshingLog.appendChild(ele);
 			},
 			SaveLogScroll()
 			{
+				if (!this.$refs.refreshingLog)
+					return;
 				let scrollParent = Util.GetScrollParent(this.$refs.refreshingLog);
 				this.isLogScrolledToBottom = scrollParent.scrollTop + scrollParent.clientHeight + 200 >= this.$refs.refreshingLog.scrollHeight;
 			},
 			LoadLogScroll()
 			{
+				if (!this.$refs.refreshingLog)
+					return;
 				if (this.isLogScrolledToBottom)
 					Util.GetScrollParent(this.$refs.refreshingLog).scrollTop = this.$refs.refreshingLog.scrollHeight;
 			}
@@ -88,6 +99,7 @@
 		beforeDestroy()
 		{
 			this.isClosing = true;
+			this.cancelLogRefresh();
 		}
 	};
 	function SetParentScrollTop(ele, h)

@@ -47,6 +47,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IRBlasters\Converter.cs" />
+    <Compile Include="IRBlasters\IRCommand.cs" />
     <Compile Include="iTach\iTachCommands.cs" />
     <Compile Include="iTach\OneLineArraySerializer.cs" />
     <Compile Include="NamedItem.cs" />
@@ -80,8 +82,10 @@
     <None Include="www\jsconfig.json" />
     <None Include="www\vues\App.vue" />
     <None Include="www\vues\common\controls\VSelect.vue" />
-    <None Include="www\vues\common\controls\HotkeyListener.vue" />
+    <None Include="www\vues\common\dialogs\ModalDialog.vue" />
+    <None Include="www\vues\common\dialogs\HotkeyListener.vue" />
     <None Include="www\vues\common\controls\Countdown.vue" />
+    <None Include="www\vues\common\dialogs\ModalDialogContainer.vue" />
     <None Include="www\vues\common\RefreshingLog.vue" />
     <None Include="www\vues\LogPage.vue" />
     <None Include="www\vues\common\NamedListItem.vue" />
@@ -112,7 +116,7 @@
     <None Include="www\404.html" />
     <None Include="www\api\api.js" />
     <None Include="www\images\sprite\input.svg" />
-    <None Include="www\scripts\Dialogs.js" />
+    <None Include="www\scripts\Dialog.js" />
     <None Include="www\Default.html" />
     <None Include="www\favicon.ico" />
     <None Include="www\images\ajax-loader.gif" />
@@ -142,12 +146,17 @@
     <None Include="www\store\store.js" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="BroadLinkRM\" />
     <Folder Include="www\styles\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\BPUtil\BPUtil\BPUtil.csproj">
       <Project>{a4981d8d-debf-4b34-b9ce-ff25520a02b7}</Project>
       <Name>BPUtil</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\broadlink-dotnet\Broadlink.Net.Framework\Broadlink.Net.Framework.csproj">
+      <Project>{084b86e2-77f9-42c0-bf04-4d25b1f99179}</Project>
+      <Name>Broadlink.Net.Framework</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

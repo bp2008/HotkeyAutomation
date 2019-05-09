@@ -31,7 +31,7 @@
 	import svg1 from 'appRoot/images/sprite/remove.svg';
 	import svg2 from 'appRoot/images/sprite/input.svg';
 	import svg3 from 'appRoot/images/sprite/arrows.svg';
-	import { ModalHotkeyListener } from 'appRoot/scripts/Dialogs.js';
+	import { ModalHotkeyListener } from 'appRoot/scripts/Dialog.js';
 	import HotkeyEffect from 'appRoot/vues/hotkeys/HotkeyEffect.vue';
 	import { Effect } from 'appRoot/scripts/EffectData.js';
 	import draggable from 'vuedraggable';

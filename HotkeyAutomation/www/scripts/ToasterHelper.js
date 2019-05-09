@@ -31,13 +31,13 @@ export default function ToasterHelper(toastMethod)
 		}
 		if (typeof message === "object" && typeof message.message === "string" && typeof message.stack === "string")
 		{
-			console.error(type + " toast", message);
+			console.error(type + " toast:", title + ".", message);
 			message = message.message + ": " + message.stack;
 		}
 		else if (typeof message === "object" && typeof message.name === "string" && typeof message.message === "string" && typeof message.code === "number")
 		{
 			message = message.name + " (code " + message.code + "): " + message.message, message;
-			console.error(type + " toast", message);
+			console.error(type + " toast:", title + ".", message);
 		}
 		else
 		{

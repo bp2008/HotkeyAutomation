@@ -1,10 +1,8 @@
-﻿import Vue from 'vue';
+﻿import "babel-polyfill";
+import Vue from 'vue';
 import App from 'appRoot/vues/App.vue';
 import CreateStore from 'appRoot/store/store.js';
 import CreateRouter from 'appRoot/router/index.js';
-
-var ModalDialogs = require('vue-modal-dialogs');
-Vue.use(ModalDialogs);
 
 import '@deveodk/vue-toastr/dist/@deveodk/vue-toastr.css';
 import VueToastr from '@deveodk/vue-toastr';

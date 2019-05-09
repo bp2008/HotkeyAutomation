@@ -1,10 +1,8 @@
 ﻿<template>
-	<div class="dialogRoot" @click="readyToClose">
-		<div class="dialogContent" v-on:click="stopProp">
-			<div :class="{ status:true, error: error }">{{status}}</div>
-			<div v-if="!error" class="unbind" @click="unbind"><span title="Removes the key binding from this hotkey">Unbind</span></div>
-			<div class="hint">Click outside this box to cancel.</div>
-		</div>
+	<div>
+		<div :class="{ status:true, error: error }">{{status}}</div>
+		<div v-if="!error" class="unbind" @click="unbind"><span title="Removes the key binding from this hotkey">Unbind</span></div>
+		<div class="hint">Click outside this box to cancel.</div>
 	</div>
 </template>
 
@@ -33,33 +31,29 @@
 		},
 		methods:
 		{
-			stopProp(event)
-			{
-				event.stopPropagation();
-			},
-			readyToClose()
+			DefaultClose()
 			{
 				if (this.bindId !== null)
 				{
 					this.status = "Canceling…";
 					ExecJSON({ cmd: "cancelHotkeyBind", bindId: this.bindId }).finally(() =>
 					{
-						this.$close(false);
+						this.$emit("close");
 					});
 				}
 				else
-					this.$close(false);
+					this.$emit("close");
 			},
 			unbind()
 			{
 				ExecJSON({ cmd: "unbindHotkey", hotkeyId: this.hotkeyId, bindId: this.bindId }).then(data =>
 				{
-					this.$close(data.data);
+					this.$emit("close", data.data);
 				}
 				).catch(err =>
 				{
 					console.error(err);
-					this.$close(false);
+					this.$emit("close");
 				});
 			}
 		},
@@ -72,7 +66,7 @@
 
 				ExecJSON({ cmd: "endHotkeyBind", hotkeyId: this.hotkeyId, bindId: this.bindId }).then(data =>
 				{
-					this.$close(data.data);
+					this.$emit("close", data.data);
 				}
 				).catch(err =>
 				{
