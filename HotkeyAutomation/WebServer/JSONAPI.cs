@@ -111,6 +111,30 @@ namespace HotkeyAutomation
 							break;
 						}
 					#endregion
+					#region BroadLink
+					case "broadlink_reorder":
+					case "broadlink_names":
+					case "broadlink_list":
+					case "broadlink_new":
+					case "broadlink_get":
+					case "broadlink_update":
+					case "broadlink_delete":
+						{
+							response = NamedItemAPI(requestObj, ServiceWrapper.config.broadLinks);
+							break;
+						}
+					case "broadlink_command_short_names":
+						{
+							response = new ResultWithData(iTachCommands.GetCommandShortNames());
+							break;
+						}
+					case "broadlink_reload_commands":
+						{
+							iTachCommands.Load(ServiceWrapper.iTachCommandsFile);
+							response = new ResultSuccess();
+							break;
+						}
+					#endregion
 					#region iTach
 					case "itach_reorder":
 					case "itach_names":

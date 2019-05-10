@@ -11,6 +11,11 @@ namespace HotkeyAutomation.HotkeyProcessing
 		#region HttpGet
 		public string httpget_url;
 		#endregion
+		#region BroadLink
+		public string broadlink_name;
+		public string broadlink_commandName;
+		public byte broadlink_repeatCount;
+		#endregion
 		#region iTach
 		public string itach_name;
 		public string itach_connectorAddress;

@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using System.Linq;
+using Newtonsoft.Json;
 
 namespace HotkeyAutomation.iTach
 {
@@ -32,5 +34,14 @@ namespace HotkeyAutomation.iTach
 		/// The repeat offset.  Must be an odd number.
 		/// </summary>
 		public ushort RepeatOffset = 1;
+
+		/// <summary>
+		/// Returns an array of pulse lengths with each value in microseconds, to aid in interoperability with other IR systems.
+		/// </summary>
+		/// <returns></returns>
+		public double[] GetMicrosecondPulses()
+		{
+			return Codes.Select(p => IRBlasters.Converter.iTachPulseSizeToMicroSeconds(p)).ToArray();
+		}
 	}
 }

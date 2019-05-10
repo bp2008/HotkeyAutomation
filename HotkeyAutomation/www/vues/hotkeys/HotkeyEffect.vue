@@ -15,6 +15,11 @@
 			<div v-if="effect.type === EffectType.HttpGet" key="httpget">
 				<label class="wide">URL: <input type="text" v-model="effect.data.httpget_url" @change="edit" /></label>
 			</div>
+			<div v-if="effect.type === EffectType.BroadLink" key="broadlink">
+				<label>BroadLink Name: <VSelect v-model="effect.data.broadlink_name" :options="broadlinkNameOptions" @change="edit" /></label>
+				<label>Command Name: <VSelect v-model="effect.data.broadlink_commandName" :options="itachCommandOptions" @change="edit" /></label>
+				<label>Repeat Count: <input type="number" v-model.number="effect.data.broadlink_repeatCount" min="0" max="255" @change="edit" /></label>
+			</div>
 			<div v-else-if="effect.type === EffectType.iTach" key="itach">
 				<label>iTach Name: <VSelect v-model="effect.data.itach_name" :options="itachNameOptions" @change="edit" /></label>
 				<label>Connector Address: <input type="text" v-model="effect.data.itach_connectorAddress" @change="edit" placeholder="e.g. 1:1 or 1:2 or 1:3" /></label>
@@ -56,13 +61,18 @@
 			return {
 				EffectType: EffectType,
 				VeraService: VeraService,
-				effectTypes: this.SimpleItemList([EffectType.HttpGet, EffectType.iTach, EffectType.Vera]),
+				effectTypes: this.SimpleItemList([EffectType.HttpGet, EffectType.BroadLink, EffectType.iTach, EffectType.Vera]),
 				veraServices: this.SimpleItemList([VeraService.DimmerValue, VeraService.SwitchSet, VeraService.CurtainStop]),
 				deleting: false
 			};
 		},
 		computed:
 		{
+			broadlinkNameOptions()
+			{
+				let data = this.$store.getters.GetCachedResponse("broadlink_names");
+				return this.SimpleItemList(data);
+			},
 			itachNameOptions()
 			{
 				let data = this.$store.getters.GetCachedResponse("itach_names");

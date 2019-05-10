@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BroadLinkRM\BroadLinkController.cs" />
     <Compile Include="IRBlasters\Converter.cs" />
     <Compile Include="IRBlasters\IRCommand.cs" />
     <Compile Include="iTach\iTachCommands.cs" />
@@ -102,6 +103,8 @@
     <None Include="www\vues\hotkeys\HotkeyEffect.vue" />
     <None Include="www\vues\itach\iTachListItem.vue" />
     <None Include="www\vues\itach\iTachList.vue" />
+    <None Include="www\vues\broadlink\BroadLinkList.vue" />
+    <None Include="www\vues\broadlink\BroadLinkListItem.vue" />
     <None Include="www\vues\vera\VeraListItem.vue" />
     <None Include="www\vues\vera\VeraList.vue" />
     <None Include="Z_NpmInstall.bat" />
@@ -146,7 +149,6 @@
     <None Include="www\store\store.js" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="BroadLinkRM\" />
     <Folder Include="www\styles\" />
   </ItemGroup>
   <ItemGroup>

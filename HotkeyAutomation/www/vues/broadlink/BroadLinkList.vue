@@ -1,8 +1,8 @@
 ﻿<template>
 	<div>
-		<List componentName="iTachListItem" itemType="iTach" apiKey="itach"></List>
+		<List componentName="BroadLinkListItem" itemType="BroadLink RM" apiKey="broadlink"></List>
 		<div class="buttons">
-			<input type="button" value="Reload Command List" @click="reloadCommandList" title="Reloads commands from iTachCommands.json" />
+			<input type="button" value="Reload BroadLink RM Commands" @click="reloadCommandList" title="Reloads commands from BroadLinkCommands.json" />
 		</div>
 	</div>
 </template>
@@ -26,9 +26,9 @@
 				if (this.isLoadingCommandList)
 					return;
 				this.isLoadingCommandList = true;
-				ExecJSON({ cmd: "itach_reload_commands" }).then(data =>
+				ExecJSON({ cmd: "broadlink_reload_commands" }).then(data =>
 				{
-					toaster.success("Reloaded iTach command list from file");
+					toaster.success(data.data);
 				}
 				).catch(err =>
 				{

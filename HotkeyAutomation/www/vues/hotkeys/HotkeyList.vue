@@ -9,6 +9,7 @@
 		components: { List },
 		created()
 		{
+			this.$store.dispatch("CacheApiResponse", "broadlink_names");
 			this.$store.dispatch("CacheApiResponse", "itach_names");
 			this.$store.dispatch("CacheApiResponse", "itach_command_short_names");
 			this.$store.dispatch("CacheApiResponse", "vera_names");

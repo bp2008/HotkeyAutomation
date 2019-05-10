@@ -7,6 +7,7 @@ import LogPage from 'appRoot/vues/LogPage.vue';
 import HotkeyList from 'appRoot/vues/hotkeys/HotkeyList.vue';
 import iTachList from 'appRoot/vues/itach/iTachList.vue';
 import VeraList from 'appRoot/vues/vera/VeraList.vue';
+import BroadLinkList from 'appRoot/vues/broadlink/BroadLinkList.vue';
 
 Vue.use(VueRouter);
 
@@ -42,6 +43,12 @@ export default function CreateRouter(store, basePath)
 						path: 'vera', component: PassThroughChild,
 						children: [
 							{ path: '', component: VeraList, name: 'veras' }
+						]
+					},
+					{
+						path: 'broadlink', component: PassThroughChild,
+						children: [
+							{ path: '', component: BroadLinkList, name: 'broadlinks' }
 						]
 					}
 				]

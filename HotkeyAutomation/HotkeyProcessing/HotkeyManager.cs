@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BPUtil;
+using HotkeyAutomation.BroadLinkRM;
 using HotkeyAutomation.iTach;
 using HotkeyAutomation.Vera;
 using Newtonsoft.Json;
@@ -128,6 +129,17 @@ namespace HotkeyAutomation.HotkeyProcessing
 							{
 								if (!string.IsNullOrWhiteSpace(effect.data.httpget_url) && Uri.TryCreate(effect.data.httpget_url, UriKind.Absolute, out Uri result))
 									ServiceWrapper.http.GET(effect.data.httpget_url);
+								break;
+							}
+						case EffectType.BroadLink:
+							{
+								BroadLinkController broadLink = ServiceWrapper.config.broadLinks.Get(effect.data.broadlink_name);
+								if (broadLink == null)
+								{
+									Logger.Debug("BroadLink \"" + effect.data.broadlink_name + "\" does not exist.");
+									break;
+								}
+								broadLink.SendCommandSync(effect.data.broadlink_commandName, effect.data.broadlink_repeatCount);
 								break;
 							}
 						case EffectType.iTach:

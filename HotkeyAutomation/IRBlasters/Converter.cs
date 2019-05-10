@@ -11,11 +11,11 @@ namespace HotkeyAutomation.IRBlasters
 	{
 		// https://github.com/bp2008/broadlink-dotnet/blob/master/BroadlinkProtocol.md
 
-		private const double BroadlinkPulseDurationInSeconds = 0.0000305175781; // a.k.a. (2 ^ -15).  a.k.a. (1 / 32768).  Why isn't this 1/38000?  Maybe it is and the guy who wrote the documentation is wrong?
-		private const double BroadlinkPulseDurationInMicroSeconds = 30.5175781; // 1 second = 1,000,000 microseconds
-		private const double iTachPulseDurationInSeconds = 0.00002631578; // 38000 KHz = (1 / 38000)
-		private const double iTachPulseDurationInMicroSeconds = 26.31578;
-		private const double OneMicrosecondInSeconds = 0.000001;
+		public const double BroadlinkPulseDurationInSeconds = 0.0000305175781; // a.k.a. (2 ^ -15).  a.k.a. (1 / 32768).  Why isn't this 1/38000?  Maybe it is and the guy who wrote the documentation is wrong?
+		public const double BroadlinkPulseDurationInMicroSeconds = 30.5175781; // 1 second = 1,000,000 microseconds
+		public const double iTachPulseDurationInSeconds = 0.00002631578; // 38000 KHz = (1 / 38000)
+		public const double iTachPulseDurationInMicroSeconds = 26.31578;
+		public const double OneMicrosecondInSeconds = 0.000001;
 		public static ushort MicroSecondsToBroadlinkPulseSize(double microSeconds)
 		{
 			return BPMath.Clamp((ushort)Math.Round(microSeconds / BroadlinkPulseDurationInMicroSeconds), (ushort)1, ushort.MaxValue);
