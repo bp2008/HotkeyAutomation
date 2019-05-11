@@ -19,6 +19,7 @@ namespace HotkeyAutomation
 		public static WebRequestUtility http;
 		public static StreamingLogReader logReader;
 		public static string iTachCommandsFile = "";
+		public static string BroadLinkCommandsFile = "";
 
 		public static void Initialize()
 		{
@@ -38,6 +39,13 @@ namespace HotkeyAutomation
 
 			iTachCommandsFile = Globals.ApplicationDirectoryBase + "iTachCommands.json";
 			iTachCommands.Load(iTachCommandsFile);
+
+#if DEBUG
+			BroadLinkCommandsFile = Globals.ApplicationDirectoryBase + "../../BroadLinkCommands.json";
+#else
+			BroadLinkCommandsFile = Globals.ApplicationDirectoryBase + "BroadLinkCommands.json";
+#endif
+			BroadLinkCommands.Load(BroadLinkCommandsFile);
 
 			logReader = new StreamingLogReader(Globals.ErrorFilePath);
 			logReader.Start();

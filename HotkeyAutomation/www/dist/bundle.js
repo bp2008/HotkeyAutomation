@@ -1183,10 +1183,64 @@ exports.default = {
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js?!./www/vues/broadlink/BroadLinkList.vue?vue&type=script&lang=js&":
-/*!*********************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/broadlink/BroadLinkList.vue?vue&type=script&lang=js& ***!
-  \*********************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js?!./www/vues/broadlink/BroadLinkCommandItem.vue?vue&type=script&lang=js&":
+/*!****************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/broadlink/BroadLinkCommandItem.vue?vue&type=script&lang=js& ***!
+  \****************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _NamedListItem = __webpack_require__(/*! appRoot/vues/common/NamedListItem.vue */ "./www/vues/common/NamedListItem.vue");
+
+var _NamedListItem2 = _interopRequireDefault(_NamedListItem);
+
+var _Dialog = __webpack_require__(/*! appRoot/scripts/Dialog.js */ "./www/scripts/Dialog.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+//
+//
+//
+//
+
+exports.default = {
+	components: { NamedListItem: _NamedListItem2.default },
+	props: {
+		item: {
+			type: Object,
+			required: true
+		}
+	},
+	methods: {
+		resetState: function resetState() {
+			if (this.$refs.item.resetState) this.$refs.item.resetState();
+		},
+		learnCodes: function learnCodes() {
+			var _this = this;
+
+			(0, _Dialog.ModalBroadLinkLearnCodesListener)(parseInt(this.$route.params.controllerId), this.item.id).then(function (result) {
+				if (result) {
+					_this.item.type = result.type;
+					_this.item.codes = result.codes;
+				}
+			});
+		}
+	}
+};
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js?!./www/vues/broadlink/BroadLinkCommandList.vue?vue&type=script&lang=js&":
+/*!****************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/broadlink/BroadLinkCommandList.vue?vue&type=script&lang=js& ***!
+  \****************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1217,6 +1271,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 exports.default = {
 	components: { List: _List2.default },
+	props: {
+		controllerId: { // Currently unused by this component, but could be used to load the controller name into the UI
+			type: String,
+			required: true
+		}
+	},
 	data: function data() {
 		return {
 			isLoadingCommandList: false
@@ -1229,7 +1289,7 @@ exports.default = {
 
 			if (this.isLoadingCommandList) return;
 			this.isLoadingCommandList = true;
-			(0, _api.ExecJSON)({ cmd: "broadlink_reload_commands" }).then(function (data) {
+			(0, _api.ExecJSON)({ cmd: "broadlinkcmd_reload_commands" }).then(function (data) {
 				toaster.success(data.data);
 			}).catch(function (err) {
 				toaster.error(err);
@@ -1237,7 +1297,45 @@ exports.default = {
 				_this.isLoadingCommandList = false;
 			});
 		}
+	},
+	created: function created() {
+		this.$store.dispatch("CacheApiResponse", "broadlinkcmd_names");
 	}
+};
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js?!./www/vues/broadlink/BroadLinkList.vue?vue&type=script&lang=js&":
+/*!*********************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/broadlink/BroadLinkList.vue?vue&type=script&lang=js& ***!
+  \*********************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _List = __webpack_require__(/*! appRoot/vues/common/List.vue */ "./www/vues/common/List.vue");
+
+var _List2 = _interopRequireDefault(_List);
+
+var _api = __webpack_require__(/*! appRoot/api/api.js */ "./www/api/api.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+//
+//
+//
+//
+//
+//
+
+exports.default = {
+	components: { List: _List2.default }
 };
 
 /***/ }),
@@ -1592,6 +1690,12 @@ exports.default = {
 		isHotkey: function isHotkey() {
 			return this.apiKey === "hotkey";
 		},
+		isBroadlinkCmd: function isBroadlinkCmd() {
+			return this.apiKey === "broadlinkcmd";
+		},
+		isBroadlinkController: function isBroadlinkController() {
+			return this.apiKey === "broadlink";
+		},
 		undoItems: function undoItems() {
 			var component = this;
 			while (component.$parent) {
@@ -1673,6 +1777,18 @@ exports.default = {
 	},
 	created: function created() {}
 }; //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2021,6 +2137,101 @@ exports.default = {
 		}
 	}
 };
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js?!./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue?vue&type=script&lang=js&":
+/*!****************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue?vue&type=script&lang=js& ***!
+  \****************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _api = __webpack_require__(/*! appRoot/api/api.js */ "./www/api/api.js");
+
+exports.default = {
+	components: {},
+	props: {
+		controllerId: {
+			type: Number,
+			required: true
+		},
+		commandId: {
+			type: Number,
+			required: true
+		}
+	},
+	data: function data() {
+		return {
+			status: "Loading…",
+			error: false,
+			lessonId: null
+		};
+	},
+
+	computed: {},
+	methods: {
+		DefaultClose: function DefaultClose() {
+			var _this = this;
+
+			// This does not currently allow cancelation. If it ever needs to, we can copy code from HotkeyListener.vue.
+			if (this.lessonId !== null) {
+				this.status = "Canceling…";
+				(0, _api.ExecJSON)({ cmd: "cancelBroadlinkCommandLearn", controllerId: this.controllerId, lessonId: this.lessonId }).finally(function () {
+					_this.$emit("close");
+				});
+			} else this.$emit("close");
+		},
+		unbind: function unbind() {
+			var _this2 = this;
+
+			(0, _api.ExecJSON)({ cmd: "unlearnBroadlinkCommand", controllerId: this.controllerId, lessonId: this.lessonId }).then(function (data) {
+				_this2.$emit("close", data.data);
+			}).catch(function (err) {
+				console.error(err);
+				_this2.$emit("close");
+			});
+		}
+	},
+	created: function created() {
+		var _this3 = this;
+
+		(0, _api.ExecJSON)({ cmd: "beginBroadlinkCommandLearn", controllerId: this.controllerId, commandId: this.commandId }).then(function (data) {
+			_this3.lessonId = data.data;
+			_this3.status = "Teach the RM device a remote control button now";
+
+			(0, _api.ExecJSON)({ cmd: "endBroadlinkCommandLearn", controllerId: _this3.controllerId, commandId: _this3.commandId, lessonId: _this3.lessonId }).then(function (data) {
+				_this3.$emit("close", data.data);
+			}).catch(function (err) {
+				_this3.error = true;
+				_this3.status = err.message;
+				console.error(err);
+			}).finally(function () {
+				_this3.lessonId = null;
+			});
+		}).catch(function (err) {
+			_this3.error = true;
+			_this3.status = err.message;
+			console.error(err);
+		});
+	},
+	mounted: function mounted() {},
+	beforeDestroy: function beforeDestroy() {}
+}; //
+//
+//
+//
+//
+//
+//
+//
 
 /***/ }),
 
@@ -2377,12 +2588,16 @@ exports.default = {
 			var data = this.$store.getters.GetCachedResponse("broadlink_names");
 			return this.SimpleItemList(data);
 		},
+		broadlinkCommandOptions: function broadlinkCommandOptions() {
+			var data = this.$store.getters.GetCachedResponse("broadlink_command_short_names");
+			return this.SimpleItemList(data);
+		},
 		itachNameOptions: function itachNameOptions() {
 			var data = this.$store.getters.GetCachedResponse("itach_names");
 			return this.SimpleItemList(data);
 		},
-		itachCommandOptions: function itachCommandOptions() {
-			var data = this.$store.getters.GetCachedResponse("itach_command_short_names");
+		irCommandOptions: function irCommandOptions() {
+			var data = this.$store.getters.GetCachedResponse("ir_command_short_names");
 			return this.SimpleItemList(data);
 		},
 		veraNameOptions: function veraNameOptions() {
@@ -2511,9 +2726,10 @@ exports.default = {
 	created: function created() {
 		this.$store.dispatch("CacheApiResponse", "broadlink_names");
 		this.$store.dispatch("CacheApiResponse", "itach_names");
-		this.$store.dispatch("CacheApiResponse", "itach_command_short_names");
 		this.$store.dispatch("CacheApiResponse", "vera_names");
 		this.$store.dispatch("CacheApiResponse", "vera_command_list");
+		this.$store.dispatch("CacheApiResponse", "broadlink_command_short_names");
+		this.$store.dispatch("CacheApiResponse", "ir_command_short_names");
 	}
 }; //
 //
@@ -28831,6 +29047,25 @@ exports.push([module.i, "\n.logPageRoot[data-v-83b81812]\n{\n\tmargin: 10px;\n}\
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js?!./www/vues/broadlink/BroadLinkCommandList.vue?vue&type=style&index=0&id=6bc3b42c&scoped=true&lang=css&":
+/*!***************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/broadlink/BroadLinkCommandList.vue?vue&type=style&index=0&id=6bc3b42c&scoped=true&lang=css& ***!
+  \***************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.buttons[data-v-6bc3b42c]\n{\n\tmargin: 10px;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js?!./www/vues/broadlink/BroadLinkList.vue?vue&type=style&index=0&id=82ff19ea&scoped=true&lang=css&":
 /*!********************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/broadlink/BroadLinkList.vue?vue&type=style&index=0&id=82ff19ea&scoped=true&lang=css& ***!
@@ -28843,7 +29078,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.buttons[data-v-82ff19ea]\n{\n\tmargin: 10px;\n}\n", ""]);
+exports.push([module.i, "\n.buttons[data-v-82ff19ea]\n{\n\tmargin: 10px;\n}\na[data-v-82ff19ea]\n{\n\t/*box-shadow: 1px 1px 3px rgba(0,0,0,0.5);*/\n\t/*background-color: rgba(0,123,255,0.05);*/ \n\tborder: 1px solid #007bff;\n\tpadding: 2px 5px;\n\tcolor: #000000;\n\t-webkit-appearance: button;\n}\n", ""]);
 
 // exports
 
@@ -28900,7 +29135,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.itemRoot[data-v-d8e36c1c]\n{\n\tborder-bottom: 1px solid #bfbfbf;\n\tpadding: 1px 5px;\n\toverflow: hidden;\n}\n.itemRoot[data-v-d8e36c1c]:last-child\n\t{\n\t\tborder-bottom: none;\n}\n.itemRoot.deleting[data-v-d8e36c1c]\n\t{\n\t\tfilter: blur(2px);\n}\n.itemRoot.working[data-v-d8e36c1c]\n\t{\n\t\tbackground-color: rgba(0,0,0,0.05);\n}\n.itemRoot.isHotkey[data-v-d8e36c1c]\n\t{\n\t\tpadding-top: 8px;\n\t\tpadding-bottom: 8px;\n\t\tbackground-color: rgba(0,0,0,0.05);\n}\n.itemRoot.isHotkey[data-v-d8e36c1c]:last-child\n\t\t{\n\t\t\tpadding-bottom: 1px;\n\t\t\tmargin-bottom: 0px;\n}\n.itemRoot.isHotkey[data-v-d8e36c1c]:first-child\n\t\t{\n\t\t\tpadding-top: 1px;\n}\n.itemRoot.isHotkey.working[data-v-d8e36c1c]\n\t\t{\n\t\t\tbackground-color: rgba(0,0,0,0.1);\n}\n.topRow[data-v-d8e36c1c]\n{\n\tdisplay: flex;\n\tflex-wrap: wrap;\n\talign-items: center;\n\tjustify-content: space-between;\n}\n.name[data-v-d8e36c1c]\n{\n\twidth: 250px;\n\tpadding-left: 3px;\n\tmargin: 5px 0px;\n}\nsvg[data-v-d8e36c1c]\n{\n\tmin-width: 40px;\n\tmin-height: 40px;\n\twidth: 40px;\n\theight: 40px;\n\tcursor: pointer;\n\tuser-select: none;\n\tmargin-left: 5px;\n\tborder: 1px solid #CCCCCC;\n\tborder-radius: 7px;\n\tbackground-color: rgba(0,0,0,0.1);\n\tfill: #000000;\n\tbox-shadow: 1px 1px 3px rgba(0,0,0,0.5);\n}\nsvg[data-v-d8e36c1c]:hover\n\t{\n\t\tbackground-color: rgba(0,0,0,0.05);\n}\nsvg[data-v-d8e36c1c]:active\n\t{\n\t\tbackground-color: #FFFFFF;\n}\nlabel[data-v-d8e36c1c]\n{\n\tmargin-bottom: 0px; /* Bootstrap sure is opinionated */\n\tmargin-left: 5px;\n}\n.keyReadout[data-v-d8e36c1c]\n{\n\tflex: 1 1 auto;\n\tmargin-left: 9px;\n}\n.buttons[data-v-d8e36c1c]\n{\n\tdisplay: flex;\n\talign-items: center;\n}\n.scaleLoader[data-v-d8e36c1c]\n{\n\topacity: 0;\n}\n.scaleLoader.visible[data-v-d8e36c1c]\n\t{\n\t\topacity: 1;\n}\n.hotkeyEffect[data-v-d8e36c1c],\n.addEffect[data-v-d8e36c1c]\n{\n\tmargin: 3px 0px 10px 0px;\n}\n.listItem_dragHandle svg[data-v-d8e36c1c]\n\t{\n\t\ttransform: rotate(90deg);\n\t\tbox-shadow: 1px -1px 3px rgba(0,0,0,0.5);\n}\n", ""]);
+exports.push([module.i, "\n.itemRoot[data-v-d8e36c1c]\n{\n\tborder-bottom: 1px solid #bfbfbf;\n\tpadding: 1px 5px;\n\toverflow: hidden;\n}\n.itemRoot[data-v-d8e36c1c]:last-child\n\t{\n\t\tborder-bottom: none;\n}\n.itemRoot.deleting[data-v-d8e36c1c]\n\t{\n\t\tfilter: blur(2px);\n}\n.itemRoot.working[data-v-d8e36c1c]\n\t{\n\t\tbackground-color: rgba(0,0,0,0.05);\n}\n.itemRoot.isHotkey[data-v-d8e36c1c]\n\t{\n\t\tpadding-top: 8px;\n\t\tpadding-bottom: 8px;\n\t\tbackground-color: rgba(0,0,0,0.05);\n}\n.itemRoot.isHotkey[data-v-d8e36c1c]:last-child\n\t\t{\n\t\t\tpadding-bottom: 1px;\n\t\t\tmargin-bottom: 0px;\n}\n.itemRoot.isHotkey[data-v-d8e36c1c]:first-child\n\t\t{\n\t\t\tpadding-top: 1px;\n}\n.itemRoot.isHotkey.working[data-v-d8e36c1c]\n\t\t{\n\t\t\tbackground-color: rgba(0,0,0,0.1);\n}\n.topRow[data-v-d8e36c1c]\n{\n\tdisplay: flex;\n\tflex-wrap: wrap;\n\talign-items: center;\n\tjustify-content: space-between;\n}\n.name[data-v-d8e36c1c]\n{\n\twidth: 250px;\n\tpadding-left: 3px;\n\tmargin: 5px 0px;\n}\nsvg[data-v-d8e36c1c]\n{\n\tmin-width: 40px;\n\tmin-height: 40px;\n\twidth: 40px;\n\theight: 40px;\n\tcursor: pointer;\n\tuser-select: none;\n\tmargin-left: 5px;\n\tborder: 1px solid #CCCCCC;\n\tborder-radius: 7px;\n\tbackground-color: rgba(0,0,0,0.1);\n\tfill: #000000;\n\tbox-shadow: 1px 1px 3px rgba(0,0,0,0.5);\n}\nsvg[data-v-d8e36c1c]:hover\n\t{\n\t\tbackground-color: rgba(0,0,0,0.05);\n}\nsvg[data-v-d8e36c1c]:active\n\t{\n\t\tbackground-color: #FFFFFF;\n}\nlabel[data-v-d8e36c1c]\n{\n\tmargin-bottom: 0px; /* Bootstrap sure is opinionated */\n\tmargin-left: 5px;\n}\n.keyReadout[data-v-d8e36c1c]\n{\n\tflex: 1 1 auto;\n\tmargin-left: 9px;\n}\n.buttons[data-v-d8e36c1c]\n{\n\tdisplay: flex;\n\talign-items: center;\n}\n.scaleLoader[data-v-d8e36c1c]\n{\n\topacity: 0;\n}\n.scaleLoader.visible[data-v-d8e36c1c]\n\t{\n\t\topacity: 1;\n}\n.hotkeyEffect[data-v-d8e36c1c],\n.addEffect[data-v-d8e36c1c]\n{\n\tmargin: 3px 0px 10px 0px;\n}\n.listItem_dragHandle svg[data-v-d8e36c1c]\n{\n\ttransform: rotate(90deg);\n\tbox-shadow: 1px -1px 3px rgba(0,0,0,0.5);\n}\n", ""]);
 
 // exports
 
@@ -28977,6 +29212,25 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 // module
 exports.push([module.i, "\nselect[data-v-12480961]\n{\n\tmax-width: 300px;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js?!./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue?vue&type=style&index=0&id=43cffab6&scoped=true&lang=css&":
+/*!***************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue?vue&type=style&index=0&id=43cffab6&scoped=true&lang=css& ***!
+  \***************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.dialogContent[data-v-43cffab6]\n{\n\tcursor: default;\n}\n.status[data-v-43cffab6]\n{\n\ttext-align: center;\n\tmargin: 10px;\n\tborder: 1px dotted black;\n\tbackground-color: #EEEEEE;\n\tpadding: 15px;\n}\n.status.error[data-v-43cffab6]\n\t{\n\t\tbackground-color: #AA0000;\n\t\tcolor: #FFFFFF;\n}\n.unbind[data-v-43cffab6]\n{\n\ttext-align: center;\n\tmargin: 10px;\n}\n.unbind span[data-v-43cffab6]\n\t{\n\t\tbackground-color: #ff8000;\n\t\tcolor: #FFFFFF;\n\t\tpadding: 3px 6px;\n\t\tcursor: pointer;\n}\n.unbind span[data-v-43cffab6]:hover\n\t\t{\n\t\t\tbackground-color: #ffae5c;\n}\n.hint[data-v-43cffab6]\n{\n\ttext-align: center;\n\tcolor: #888888;\n\tfont-style: italic;\n}\n", ""]);
 
 // exports
 
@@ -36224,6 +36478,36 @@ if(false) {}
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js?!./www/vues/broadlink/BroadLinkCommandList.vue?vue&type=style&index=0&id=6bc3b42c&scoped=true&lang=css&":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader!./node_modules/css-loader!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/broadlink/BroadLinkCommandList.vue?vue&type=style&index=0&id=6bc3b42c&scoped=true&lang=css& ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../../node_modules/css-loader!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/vue-loader/lib??vue-loader-options!./BroadLinkCommandList.vue?vue&type=style&index=0&id=6bc3b42c&scoped=true&lang=css& */ "./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js?!./www/vues/broadlink/BroadLinkCommandList.vue?vue&type=style&index=0&id=6bc3b42c&scoped=true&lang=css&");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js?!./www/vues/broadlink/BroadLinkList.vue?vue&type=style&index=0&id=82ff19ea&scoped=true&lang=css&":
 /*!************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/style-loader!./node_modules/css-loader!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/broadlink/BroadLinkList.vue?vue&type=style&index=0&id=82ff19ea&scoped=true&lang=css& ***!
@@ -36443,6 +36727,36 @@ if(false) {}
 
 
 var content = __webpack_require__(/*! !../../../../node_modules/css-loader!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/vue-loader/lib??vue-loader-options!./VSelect.vue?vue&type=style&index=0&id=12480961&scoped=true&lang=css& */ "./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js?!./www/vues/common/controls/VSelect.vue?vue&type=style&index=0&id=12480961&scoped=true&lang=css&");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js?!./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue?vue&type=style&index=0&id=43cffab6&scoped=true&lang=css&":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader!./node_modules/css-loader!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue?vue&type=style&index=0&id=43cffab6&scoped=true&lang=css& ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../../../node_modules/css-loader!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/vue-loader/lib??vue-loader-options!./BroadLinkLearnCodesListener.vue?vue&type=style&index=0&id=43cffab6&scoped=true&lang=css& */ "./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js?!./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue?vue&type=style&index=0&id=43cffab6&scoped=true&lang=css&");
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 
@@ -38693,6 +39007,91 @@ render._withStripped = true
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./www/vues/broadlink/BroadLinkCommandItem.vue?vue&type=template&id=61be3c21&":
+/*!******************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/broadlink/BroadLinkCommandItem.vue?vue&type=template&id=61be3c21& ***!
+  \******************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "NamedListItem",
+    _vm._g(
+      {
+        ref: "item",
+        attrs: {
+          item: _vm.item,
+          apiKey: "broadlinkcmd",
+          itemType: "BroadLinkCommand"
+        },
+        on: { learnCodes: _vm.learnCodes }
+      },
+      _vm.$listeners
+    )
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./www/vues/broadlink/BroadLinkCommandList.vue?vue&type=template&id=6bc3b42c&scoped=true&":
+/*!******************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/broadlink/BroadLinkCommandList.vue?vue&type=template&id=6bc3b42c&scoped=true& ***!
+  \******************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    [
+      _c("List", {
+        attrs: {
+          componentName: "BroadLinkCommandItem",
+          itemType: "BroadLink Command",
+          apiKey: "broadlinkcmd"
+        }
+      }),
+      _vm._v(" "),
+      _c("div", { staticClass: "buttons" }, [
+        _c("input", {
+          attrs: {
+            type: "button",
+            value: "Reload BroadLink RM Commands",
+            title: "Reloads commands from BroadLinkCommands.json"
+          },
+          on: { click: _vm.reloadCommandList }
+        })
+      ])
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./www/vues/broadlink/BroadLinkList.vue?vue&type=template&id=82ff19ea&scoped=true&":
 /*!***********************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/broadlink/BroadLinkList.vue?vue&type=template&id=82ff19ea&scoped=true& ***!
@@ -38717,18 +39116,7 @@ var render = function() {
           itemType: "BroadLink RM",
           apiKey: "broadlink"
         }
-      }),
-      _vm._v(" "),
-      _c("div", { staticClass: "buttons" }, [
-        _c("input", {
-          attrs: {
-            type: "button",
-            value: "Reload BroadLink RM Commands",
-            title: "Reloads commands from BroadLinkCommands.json"
-          },
-          on: { click: _vm.reloadCommandList }
-        })
-      ])
+      })
     ],
     1
   )
@@ -38918,138 +39306,180 @@ var render = function() {
       }
     },
     [
-      _c("div", { staticClass: "topRow" }, [
-        _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.item.name,
-              expression: "item.name"
-            }
-          ],
-          staticClass: "name",
-          attrs: {
-            type: "text",
-            placeholder: "Name this " + _vm.itemType + "…"
-          },
-          domProps: { value: _vm.item.name },
-          on: {
-            change: _vm.edit,
-            input: function($event) {
-              if ($event.target.composing) {
-                return
-              }
-              _vm.$set(_vm.item, "name", $event.target.value)
-            }
-          }
-        }),
-        _vm._v(" "),
-        !_vm.isHotkey
-          ? _c("label", [
-              _vm._v("\n\t\t\tHost:\n\t\t\t"),
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.item.host,
-                    expression: "item.host"
-                  }
-                ],
-                staticClass: "host",
-                attrs: { type: "text", placeholder: "192.168.x.x" },
-                domProps: { value: _vm.item.host },
-                on: {
-                  change: _vm.edit,
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
-                    }
-                    _vm.$set(_vm.item, "host", $event.target.value)
-                  }
-                }
-              })
-            ])
-          : _vm._e(),
-        _vm._v(" "),
-        !_vm.isHotkey && _vm.includePort
-          ? _c("label", [
-              _vm._v("\n\t\t\tPort:\n\t\t\t"),
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model.number",
-                    value: _vm.item.port,
-                    expression: "item.port",
-                    modifiers: { number: true }
-                  }
-                ],
-                staticClass: "port",
-                attrs: {
-                  type: "number",
-                  min: "1",
-                  max: "65535",
-                  placeholder: _vm.portPlaceholder
-                },
-                domProps: { value: _vm.item.port },
-                on: {
-                  change: _vm.edit,
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
-                    }
-                    _vm.$set(_vm.item, "port", _vm._n($event.target.value))
-                  },
-                  blur: function($event) {
-                    _vm.$forceUpdate()
-                  }
-                }
-              })
-            ])
-          : _vm._e(),
-        _vm._v(" "),
-        _vm.isHotkey
-          ? _c("span", { attrs: { title: "Bind new key" } }, [
-              _c("svg", { on: { click: _vm.hotkeyListen } }, [
-                _c("use", { attrs: { "xlink:href": "#input" } })
-              ])
-            ])
-          : _vm._e(),
-        _vm._v(" "),
-        _vm.isHotkey
-          ? _c("span", { staticClass: "keyReadout" }, [
-              _vm._v(_vm._s(_vm.item.keyName))
-            ])
-          : _vm._e(),
-        _vm._v(" "),
-        _c(
-          "div",
-          { staticClass: "buttons" },
-          [
-            _c("ScaleLoader", {
-              class: { scaleLoader: true, visible: _vm.working }
-            }),
-            _vm._v(" "),
-            _c(
-              "span",
+      _c(
+        "div",
+        { staticClass: "topRow" },
+        [
+          _c("input", {
+            directives: [
               {
-                staticClass: "listItem_dragHandle",
-                attrs: { title: "Drag me!" }
-              },
-              [_c("svg", [_c("use", { attrs: { "xlink:href": "#arrows" } })])]
-            ),
-            _vm._v(" "),
-            _c("span", { attrs: { title: "Delete this " + _vm.itemType } }, [
-              _c("svg", { on: { click: _vm.removeClick } }, [
-                _c("use", { attrs: { "xlink:href": "#remove" } })
+                name: "model",
+                rawName: "v-model",
+                value: _vm.item.name,
+                expression: "item.name"
+              }
+            ],
+            staticClass: "name",
+            attrs: {
+              type: "text",
+              placeholder: "Name this " + _vm.itemType + "…"
+            },
+            domProps: { value: _vm.item.name },
+            on: {
+              change: _vm.edit,
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.$set(_vm.item, "name", $event.target.value)
+              }
+            }
+          }),
+          _vm._v(" "),
+          !_vm.isHotkey && !_vm.isBroadlinkCmd
+            ? _c("label", [
+                _vm._v("\n\t\t\tHost:\n\t\t\t"),
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.item.host,
+                      expression: "item.host"
+                    }
+                  ],
+                  staticClass: "host",
+                  attrs: { type: "text", placeholder: "192.168.x.x" },
+                  domProps: { value: _vm.item.host },
+                  on: {
+                    change: _vm.edit,
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(_vm.item, "host", $event.target.value)
+                    }
+                  }
+                })
               ])
-            ])
-          ],
-          1
-        )
-      ]),
+            : _vm._e(),
+          _vm._v(" "),
+          !_vm.isHotkey && !_vm.isBroadlinkCmd && _vm.includePort
+            ? _c("label", [
+                _vm._v("\n\t\t\tPort:\n\t\t\t"),
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model.number",
+                      value: _vm.item.port,
+                      expression: "item.port",
+                      modifiers: { number: true }
+                    }
+                  ],
+                  staticClass: "port",
+                  attrs: {
+                    type: "number",
+                    min: "1",
+                    max: "65535",
+                    placeholder: _vm.portPlaceholder
+                  },
+                  domProps: { value: _vm.item.port },
+                  on: {
+                    change: _vm.edit,
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(_vm.item, "port", _vm._n($event.target.value))
+                    },
+                    blur: function($event) {
+                      _vm.$forceUpdate()
+                    }
+                  }
+                })
+              ])
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.isHotkey
+            ? _c("span", { attrs: { title: "Bind new key" } }, [
+                _c("svg", { on: { click: _vm.hotkeyListen } }, [
+                  _c("use", { attrs: { "xlink:href": "#input" } })
+                ])
+              ])
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.isHotkey
+            ? _c("span", { staticClass: "keyReadout" }, [
+                _vm._v(_vm._s(_vm.item.keyName))
+              ])
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.isBroadlinkCmd
+            ? _c("span", { attrs: { title: "Learn new codes" } }, [
+                _c(
+                  "svg",
+                  {
+                    on: {
+                      click: function($event) {
+                        _vm.$emit("learnCodes")
+                      }
+                    }
+                  },
+                  [_c("use", { attrs: { "xlink:href": "#input" } })]
+                )
+              ])
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.isBroadlinkCmd
+            ? _c("span", { staticClass: "keyReadout" }, [
+                _vm._v(_vm._s(_vm.item.codes ? "Codes Learned" : ""))
+              ])
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.isBroadlinkController
+            ? _c(
+                "router-link",
+                {
+                  attrs: {
+                    to: {
+                      name: "broadlinkcmds",
+                      params: { controllerId: this.item.id }
+                    }
+                  }
+                },
+                [_vm._v("Manage Commands")]
+              )
+            : _vm._e(),
+          _vm._v(" "),
+          _c(
+            "div",
+            { staticClass: "buttons" },
+            [
+              _c("ScaleLoader", {
+                class: { scaleLoader: true, visible: _vm.working }
+              }),
+              _vm._v(" "),
+              _c(
+                "span",
+                {
+                  staticClass: "listItem_dragHandle",
+                  attrs: { title: "Drag me!" }
+                },
+                [_c("svg", [_c("use", { attrs: { "xlink:href": "#arrows" } })])]
+              ),
+              _vm._v(" "),
+              _c("span", { attrs: { title: "Delete this " + _vm.itemType } }, [
+                _c("svg", { on: { click: _vm.removeClick } }, [
+                  _c("use", { attrs: { "xlink:href": "#remove" } })
+                ])
+              ])
+            ],
+            1
+          )
+        ],
+        1
+      ),
       _vm._v(" "),
       _vm.isHotkey
         ? _c(
@@ -39080,6 +39510,53 @@ var render = function() {
             ],
             1
           )
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.isBroadlinkCmd
+        ? _c("div", [_vm._v(_vm._s(_vm.item.codes))])
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.isBroadlinkCmd
+        ? _c("div", [
+            _c("span", [
+              _vm._v("Type: "),
+              _c("b", [_vm._v(_vm._s(_vm.item.type))])
+            ]),
+            _vm._v("\n\t\t   \n\t\t"),
+            _c("label", [
+              _vm._v("\n\t\t\tDefault Repeat Count (0-255):\n\t\t\t"),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model.number",
+                    value: _vm.item.repeat,
+                    expression: "item.repeat",
+                    modifiers: { number: true }
+                  }
+                ],
+                attrs: {
+                  type: "number",
+                  min: "0",
+                  max: "255",
+                  placeholder: "Repeat"
+                },
+                domProps: { value: _vm.item.repeat },
+                on: {
+                  change: _vm.edit,
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(_vm.item, "repeat", _vm._n($event.target.value))
+                  },
+                  blur: function($event) {
+                    _vm.$forceUpdate()
+                  }
+                }
+              })
+            ])
+          ])
         : _vm._e(),
       _vm._v(" "),
       _vm.isHotkey
@@ -39267,6 +39744,48 @@ var render = function() {
       ])
     })
   )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue?vue&type=template&id=43cffab6&scoped=true&":
+/*!******************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue?vue&type=template&id=43cffab6&scoped=true& ***!
+  \******************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _c("div", { class: { status: true, error: _vm.error } }, [
+      _vm._v(_vm._s(_vm.status))
+    ]),
+    _vm._v(" "),
+    !_vm.error
+      ? _c("div", { staticClass: "unbind", on: { click: _vm.unbind } }, [
+          _c(
+            "span",
+            { attrs: { title: "Removes the codes from this command" } },
+            [_vm._v("Unbind")]
+          )
+        ])
+      : _vm._e(),
+    _vm._v(" "),
+    _c("div", { staticClass: "hint" }, [
+      _vm._v("Click outside this box to cancel.")
+    ])
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -39625,7 +40144,7 @@ var render = function() {
                   [
                     _vm._v("Command Name: "),
                     _c("VSelect", {
-                      attrs: { options: _vm.itachCommandOptions },
+                      attrs: { options: _vm.broadlinkCommandOptions },
                       on: { change: _vm.edit },
                       model: {
                         value: _vm.effect.data.broadlink_commandName,
@@ -39736,7 +40255,7 @@ var render = function() {
                     [
                       _vm._v("Command Name: "),
                       _c("VSelect", {
-                        attrs: { options: _vm.itachCommandOptions },
+                        attrs: { options: _vm.irCommandOptions },
                         on: { change: _vm.edit },
                         model: {
                           value: _vm.effect.data.itach_commandShortName,
@@ -52531,6 +53050,10 @@ var _BroadLinkListItem = __webpack_require__(/*! appRoot/vues/broadlink/BroadLin
 
 var _BroadLinkListItem2 = _interopRequireDefault(_BroadLinkListItem);
 
+var _BroadLinkCommandItem = __webpack_require__(/*! appRoot/vues/broadlink/BroadLinkCommandItem.vue */ "./www/vues/broadlink/BroadLinkCommandItem.vue");
+
+var _BroadLinkCommandItem2 = _interopRequireDefault(_BroadLinkCommandItem);
+
 var _ToasterHelper = __webpack_require__(/*! appRoot/scripts/ToasterHelper.js */ "./www/scripts/ToasterHelper.js");
 
 var _ToasterHelper2 = _interopRequireDefault(_ToasterHelper);
@@ -52557,6 +53080,7 @@ _vue2.default.component('HotkeyListItem', _HotkeyListItem2.default);
 _vue2.default.component('iTachListItem', _iTachListItem2.default);
 _vue2.default.component('VeraListItem', _VeraListItem2.default);
 _vue2.default.component('BroadLinkListItem', _BroadLinkListItem2.default);
+_vue2.default.component('BroadLinkCommandItem', _BroadLinkCommandItem2.default);
 
 // Any recursively nested components must be globally registered here
 //Vue.component('Example', require('Example.vue').default);
@@ -52638,6 +53162,10 @@ var _BroadLinkList = __webpack_require__(/*! appRoot/vues/broadlink/BroadLinkLis
 
 var _BroadLinkList2 = _interopRequireDefault(_BroadLinkList);
 
+var _BroadLinkCommandList = __webpack_require__(/*! appRoot/vues/broadlink/BroadLinkCommandList.vue */ "./www/vues/broadlink/BroadLinkCommandList.vue");
+
+var _BroadLinkCommandList2 = _interopRequireDefault(_BroadLinkCommandList);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 _vue2.default.use(_vueRouter2.default);
@@ -52662,6 +53190,8 @@ function CreateRouter(store, basePath) {
 			}, {
 				path: 'broadlink', component: _PassThroughChild2.default,
 				children: [{ path: '', component: _BroadLinkList2.default, name: 'broadlinks' }]
+			}, {
+				path: 'broadlinkcmds/:controllerId', component: _BroadLinkCommandList2.default, name: 'broadlinkcmds', props: true
 			}]
 		}],
 		$store: store
@@ -52698,6 +53228,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.ModalDialog = ModalDialog;
 exports.ModalHotkeyListener = ModalHotkeyListener;
+exports.ModalBroadLinkLearnCodesListener = ModalBroadLinkLearnCodesListener;
 exports.RegisterModalDialogContainer = RegisterModalDialogContainer;
 exports.UnregisterModalDialogContainer = UnregisterModalDialogContainer;
 exports.CountOpenDialogs = CountOpenDialogs;
@@ -52710,6 +53241,10 @@ var _HotkeyListener = __webpack_require__(/*! appRoot/vues/common/dialogs/Hotkey
 
 var _HotkeyListener2 = _interopRequireDefault(_HotkeyListener);
 
+var _BroadLinkLearnCodesListener = __webpack_require__(/*! appRoot/vues/common/dialogs/BroadLinkLearnCodesListener.vue */ "./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue");
+
+var _BroadLinkLearnCodesListener2 = _interopRequireDefault(_BroadLinkLearnCodesListener);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var createModalDialog = create({ component: _ModalDialog2.default, wrapper: 'dialogFade' });
@@ -52720,6 +53255,15 @@ function ModalDialog(contentComponent, contentProps) {
 
 function ModalHotkeyListener(hotkeyId) {
 	return ModalDialog(_HotkeyListener2.default, { hotkeyId: hotkeyId });
+}
+/**
+ * Opens the "Learn BroadLink Command Codes" dialog.
+ * @param {Number} controllerId ID of the BroadLink Controller to use for learning.
+ * @param {Number} commandId Command ID
+ * @returns {Promise} Returns a promise which resolves when the dialog closes and does not reject.
+ */
+function ModalBroadLinkLearnCodesListener(controllerId, commandId) {
+	return ModalDialog(_BroadLinkLearnCodesListener2.default, { controllerId: controllerId, commandId: commandId });
 }
 
 /////////////////////////////////
@@ -53584,6 +54128,168 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./www/vues/broadlink/BroadLinkCommandItem.vue":
+/*!*****************************************************!*\
+  !*** ./www/vues/broadlink/BroadLinkCommandItem.vue ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _BroadLinkCommandItem_vue_vue_type_template_id_61be3c21___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BroadLinkCommandItem.vue?vue&type=template&id=61be3c21& */ "./www/vues/broadlink/BroadLinkCommandItem.vue?vue&type=template&id=61be3c21&");
+/* harmony import */ var _BroadLinkCommandItem_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BroadLinkCommandItem.vue?vue&type=script&lang=js& */ "./www/vues/broadlink/BroadLinkCommandItem.vue?vue&type=script&lang=js&");
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _BroadLinkCommandItem_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _BroadLinkCommandItem_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _BroadLinkCommandItem_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _BroadLinkCommandItem_vue_vue_type_template_id_61be3c21___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _BroadLinkCommandItem_vue_vue_type_template_id_61be3c21___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "www/vues/broadlink/BroadLinkCommandItem.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./www/vues/broadlink/BroadLinkCommandItem.vue?vue&type=script&lang=js&":
+/*!******************************************************************************!*\
+  !*** ./www/vues/broadlink/BroadLinkCommandItem.vue?vue&type=script&lang=js& ***!
+  \******************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandItem_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib!../../../node_modules/vue-loader/lib??vue-loader-options!./BroadLinkCommandItem.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js?!./www/vues/broadlink/BroadLinkCommandItem.vue?vue&type=script&lang=js&");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandItem_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandItem_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandItem_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandItem_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandItem_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0___default.a); 
+
+/***/ }),
+
+/***/ "./www/vues/broadlink/BroadLinkCommandItem.vue?vue&type=template&id=61be3c21&":
+/*!************************************************************************************!*\
+  !*** ./www/vues/broadlink/BroadLinkCommandItem.vue?vue&type=template&id=61be3c21& ***!
+  \************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandItem_vue_vue_type_template_id_61be3c21___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./BroadLinkCommandItem.vue?vue&type=template&id=61be3c21& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./www/vues/broadlink/BroadLinkCommandItem.vue?vue&type=template&id=61be3c21&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandItem_vue_vue_type_template_id_61be3c21___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandItem_vue_vue_type_template_id_61be3c21___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./www/vues/broadlink/BroadLinkCommandList.vue":
+/*!*****************************************************!*\
+  !*** ./www/vues/broadlink/BroadLinkCommandList.vue ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _BroadLinkCommandList_vue_vue_type_template_id_6bc3b42c_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BroadLinkCommandList.vue?vue&type=template&id=6bc3b42c&scoped=true& */ "./www/vues/broadlink/BroadLinkCommandList.vue?vue&type=template&id=6bc3b42c&scoped=true&");
+/* harmony import */ var _BroadLinkCommandList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BroadLinkCommandList.vue?vue&type=script&lang=js& */ "./www/vues/broadlink/BroadLinkCommandList.vue?vue&type=script&lang=js&");
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _BroadLinkCommandList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _BroadLinkCommandList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+/* harmony import */ var _BroadLinkCommandList_vue_vue_type_style_index_0_id_6bc3b42c_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./BroadLinkCommandList.vue?vue&type=style&index=0&id=6bc3b42c&scoped=true&lang=css& */ "./www/vues/broadlink/BroadLinkCommandList.vue?vue&type=style&index=0&id=6bc3b42c&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+  _BroadLinkCommandList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _BroadLinkCommandList_vue_vue_type_template_id_6bc3b42c_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _BroadLinkCommandList_vue_vue_type_template_id_6bc3b42c_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "6bc3b42c",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "www/vues/broadlink/BroadLinkCommandList.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./www/vues/broadlink/BroadLinkCommandList.vue?vue&type=script&lang=js&":
+/*!******************************************************************************!*\
+  !*** ./www/vues/broadlink/BroadLinkCommandList.vue?vue&type=script&lang=js& ***!
+  \******************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib!../../../node_modules/vue-loader/lib??vue-loader-options!./BroadLinkCommandList.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js?!./www/vues/broadlink/BroadLinkCommandList.vue?vue&type=script&lang=js&");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0___default.a); 
+
+/***/ }),
+
+/***/ "./www/vues/broadlink/BroadLinkCommandList.vue?vue&type=style&index=0&id=6bc3b42c&scoped=true&lang=css&":
+/*!**************************************************************************************************************!*\
+  !*** ./www/vues/broadlink/BroadLinkCommandList.vue?vue&type=style&index=0&id=6bc3b42c&scoped=true&lang=css& ***!
+  \**************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandList_vue_vue_type_style_index_0_id_6bc3b42c_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader!../../../node_modules/css-loader!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/vue-loader/lib??vue-loader-options!./BroadLinkCommandList.vue?vue&type=style&index=0&id=6bc3b42c&scoped=true&lang=css& */ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js?!./www/vues/broadlink/BroadLinkCommandList.vue?vue&type=style&index=0&id=6bc3b42c&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandList_vue_vue_type_style_index_0_id_6bc3b42c_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandList_vue_vue_type_style_index_0_id_6bc3b42c_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandList_vue_vue_type_style_index_0_id_6bc3b42c_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandList_vue_vue_type_style_index_0_id_6bc3b42c_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandList_vue_vue_type_style_index_0_id_6bc3b42c_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default.a); 
+
+/***/ }),
+
+/***/ "./www/vues/broadlink/BroadLinkCommandList.vue?vue&type=template&id=6bc3b42c&scoped=true&":
+/*!************************************************************************************************!*\
+  !*** ./www/vues/broadlink/BroadLinkCommandList.vue?vue&type=template&id=6bc3b42c&scoped=true& ***!
+  \************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandList_vue_vue_type_template_id_6bc3b42c_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./BroadLinkCommandList.vue?vue&type=template&id=6bc3b42c&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./www/vues/broadlink/BroadLinkCommandList.vue?vue&type=template&id=6bc3b42c&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandList_vue_vue_type_template_id_6bc3b42c_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkCommandList_vue_vue_type_template_id_6bc3b42c_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./www/vues/broadlink/BroadLinkList.vue":
 /*!**********************************************!*\
   !*** ./www/vues/broadlink/BroadLinkList.vue ***!
@@ -54424,6 +55130,96 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_VSelect_vue_vue_type_template_id_12480961_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_VSelect_vue_vue_type_template_id_12480961_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue":
+/*!*****************************************************************!*\
+  !*** ./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue ***!
+  \*****************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _BroadLinkLearnCodesListener_vue_vue_type_template_id_43cffab6_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BroadLinkLearnCodesListener.vue?vue&type=template&id=43cffab6&scoped=true& */ "./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue?vue&type=template&id=43cffab6&scoped=true&");
+/* harmony import */ var _BroadLinkLearnCodesListener_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BroadLinkLearnCodesListener.vue?vue&type=script&lang=js& */ "./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue?vue&type=script&lang=js&");
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _BroadLinkLearnCodesListener_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _BroadLinkLearnCodesListener_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+/* harmony import */ var _BroadLinkLearnCodesListener_vue_vue_type_style_index_0_id_43cffab6_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./BroadLinkLearnCodesListener.vue?vue&type=style&index=0&id=43cffab6&scoped=true&lang=css& */ "./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue?vue&type=style&index=0&id=43cffab6&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+  _BroadLinkLearnCodesListener_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _BroadLinkLearnCodesListener_vue_vue_type_template_id_43cffab6_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _BroadLinkLearnCodesListener_vue_vue_type_template_id_43cffab6_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "43cffab6",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "www/vues/common/dialogs/BroadLinkLearnCodesListener.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue?vue&type=script&lang=js&":
+/*!******************************************************************************************!*\
+  !*** ./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue?vue&type=script&lang=js& ***!
+  \******************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkLearnCodesListener_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib!../../../../node_modules/vue-loader/lib??vue-loader-options!./BroadLinkLearnCodesListener.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js?!./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue?vue&type=script&lang=js&");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkLearnCodesListener_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkLearnCodesListener_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkLearnCodesListener_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkLearnCodesListener_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkLearnCodesListener_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0___default.a); 
+
+/***/ }),
+
+/***/ "./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue?vue&type=style&index=0&id=43cffab6&scoped=true&lang=css&":
+/*!**************************************************************************************************************************!*\
+  !*** ./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue?vue&type=style&index=0&id=43cffab6&scoped=true&lang=css& ***!
+  \**************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkLearnCodesListener_vue_vue_type_style_index_0_id_43cffab6_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader!../../../../node_modules/css-loader!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/vue-loader/lib??vue-loader-options!./BroadLinkLearnCodesListener.vue?vue&type=style&index=0&id=43cffab6&scoped=true&lang=css& */ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js?!./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue?vue&type=style&index=0&id=43cffab6&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkLearnCodesListener_vue_vue_type_style_index_0_id_43cffab6_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkLearnCodesListener_vue_vue_type_style_index_0_id_43cffab6_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkLearnCodesListener_vue_vue_type_style_index_0_id_43cffab6_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkLearnCodesListener_vue_vue_type_style_index_0_id_43cffab6_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkLearnCodesListener_vue_vue_type_style_index_0_id_43cffab6_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default.a); 
+
+/***/ }),
+
+/***/ "./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue?vue&type=template&id=43cffab6&scoped=true&":
+/*!************************************************************************************************************!*\
+  !*** ./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue?vue&type=template&id=43cffab6&scoped=true& ***!
+  \************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkLearnCodesListener_vue_vue_type_template_id_43cffab6_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./BroadLinkLearnCodesListener.vue?vue&type=template&id=43cffab6&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./www/vues/common/dialogs/BroadLinkLearnCodesListener.vue?vue&type=template&id=43cffab6&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkLearnCodesListener_vue_vue_type_template_id_43cffab6_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BroadLinkLearnCodesListener_vue_vue_type_template_id_43cffab6_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

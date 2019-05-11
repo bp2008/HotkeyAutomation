@@ -125,13 +125,91 @@ namespace HotkeyAutomation
 						}
 					case "broadlink_command_short_names":
 						{
-							response = new ResultWithData(iTachCommands.GetCommandShortNames());
+							response = new ResultWithData(IRBlasters.IRCommands.GetIRCommandShortNames());
 							break;
 						}
-					case "broadlink_reload_commands":
+					#endregion
+					#region BroadLink Commands
+					case "broadlinkcmd_reorder":
+					case "broadlinkcmd_names":
+					case "broadlinkcmd_list":
+					case "broadlinkcmd_new":
+					case "broadlinkcmd_get":
+					case "broadlinkcmd_update":
+					case "broadlinkcmd_delete":
 						{
-							iTachCommands.Load(ServiceWrapper.iTachCommandsFile);
+							response = NamedItemAPI(requestObj, BroadLinkCommands.commands, (Action)(() =>
+							{
+								BroadLinkCommands.Save(ServiceWrapper.BroadLinkCommandsFile);
+							}));
+							break;
+						}
+					case "broadlinkcmd_reload_commands":
+						{
+							BroadLinkCommands.Load(ServiceWrapper.BroadLinkCommandsFile);
 							response = new ResultSuccess();
+							break;
+						}
+					case "beginBroadlinkCommandLearn":
+						{
+							int controllerId = requestObj.controllerId;
+							int commandId = requestObj.commandId;
+							string lessonId = BroadLinkCommands.BeginLearning(controllerId, commandId);
+							if (lessonId == null)
+								response = new ResultFailWithReason("hotkey not found");
+							else if (lessonId == "")
+								response = new ResultFailWithReason("another bind is already in progress");
+							else
+								response = new ResultWithData(lessonId);
+							break;
+						}
+					case "endBroadlinkCommandLearn":
+						{
+							int controllerId = requestObj.controllerId;
+							int commandId = requestObj.commandId;
+							BroadLinkCmd command = BroadLinkCommands.commands.Get(commandId);
+							if (command == null)
+							{
+								response = new ResultFailWithReason("command not found");
+								break;
+							}
+							string lessonId = requestObj.lessonId;
+							if (string.IsNullOrWhiteSpace(lessonId))
+							{
+								response = new ResultFailWithReason("invalid lessonId");
+								break;
+							}
+							BroadLinkCommands.AwaitLearningResult(controllerId, lessonId);
+							response = new ResultWithData(command);
+							break;
+						}
+					case "cancelBroadlinkCommandLearn":
+						{
+							int controllerId = requestObj.controllerId;
+							string lessonId = requestObj.lessonId;
+							if (string.IsNullOrWhiteSpace(lessonId))
+							{
+								response = new ResultFailWithReason("invalid lessonId");
+								break;
+							}
+							BroadLinkCommands.CancelLearning(controllerId, lessonId);
+							response = new ResultSuccess();
+							break;
+						}
+					case "unlearnBroadlinkCommand":
+						{
+							int controllerId = requestObj.controllerId;
+							string lessonId = requestObj.lessonId;
+							if (string.IsNullOrWhiteSpace(lessonId))
+							{
+								response = new ResultFailWithReason("invalid lessonId");
+								break;
+							}
+							BroadLinkCmd command = BroadLinkCommands.UnlearnCommandCodes(controllerId, lessonId);
+							if (command != null)
+								response = new ResultWithData(command);
+							else
+								response = new ResultFailWithReason("Unable to unbind command. Please try again.");
 							break;
 						}
 					#endregion
@@ -147,9 +225,9 @@ namespace HotkeyAutomation
 							response = NamedItemAPI(requestObj, ServiceWrapper.config.iTachs);
 							break;
 						}
-					case "itach_command_short_names":
+					case "ir_command_short_names":
 						{
-							response = new ResultWithData(iTachCommands.GetCommandShortNames());
+							response = new ResultWithData(IRBlasters.IRCommands.GetIRCommandShortNames());
 							break;
 						}
 					case "itach_reload_commands":
@@ -224,8 +302,10 @@ namespace HotkeyAutomation
 				p.outputStream.Write(JsonConvert.SerializeObject(response));
 			}
 		}
-		private static object NamedItemAPI<T>(dynamic requestObj, NamedItemCollection<T> collection) where T : NamedItem, new()
+		private static object NamedItemAPI<T>(dynamic requestObj, NamedItemCollection<T> collection, Action saveCollection = null) where T : NamedItem, new()
 		{
+			if (saveCollection == null)
+				saveCollection = (Action)(() => { ServiceWrapper.config.Save(); });
 			string cmd = requestObj.cmd;
 			int idxUnderscore = cmd.LastIndexOf('_');
 			if (idxUnderscore > -1 && idxUnderscore + 1 < cmd.Length)
@@ -249,7 +329,7 @@ namespace HotkeyAutomation
 						object result = collection.New();
 						if (result != null)
 						{
-							ServiceWrapper.config.Save();
+							saveCollection();
 							return new ResultWithData(result);
 						}
 						else
@@ -269,7 +349,7 @@ namespace HotkeyAutomation
 						T item = JsonConvert.DeserializeObject<T>(itemReserialized);
 						if (collection.Update(item))
 						{
-							ServiceWrapper.config.Save();
+							saveCollection();
 							return new ResultWithData(item);
 						}
 						else
@@ -284,7 +364,7 @@ namespace HotkeyAutomation
 				case "delete":
 					{
 						collection.Delete((int)requestObj.id);
-						ServiceWrapper.config.Save();
+						saveCollection();
 						return new ResultSuccess();
 					}
 				default:

@@ -95,7 +95,8 @@ namespace HotkeyAutomation.iTach
 				Logger.Debug("iTach command null is not valid");
 				return;
 			}
-			if (iTachCommands.commands.TryGetValue(commandShortName, out iTachCmd cmd))
+			iTachCmd cmd = GetCommandFromShortName(commandShortName);
+			if (cmd != null)
 			{
 				string result = SendCommandSync(cmd, connectorAddress, repeat);
 				if (result != null)
@@ -105,6 +106,23 @@ namespace HotkeyAutomation.iTach
 			{
 				Logger.Debug("iTach command \"" + commandShortName + "\" not found");
 			}
+		}
+		private iTachCmd GetCommandFromShortName(string name)
+		{
+			if (iTachCommands.commands.TryGetValue(name, out iTachCmd cmd))
+				return cmd;
+			BroadLinkCmd broadLinkCmd = BroadLinkCommands.commands.Get(name);
+			if (broadLinkCmd != null && broadLinkCmd.type == Broadlink.Net.RMCommandType.IR)
+			{
+				cmd = new iTachCmd();
+				cmd.LongName = cmd.ShortName = broadLinkCmd.name;
+				cmd.Frequency = 38000;
+				cmd.Codes = broadLinkCmd.codes;
+				cmd.ConnectorAddress = "1:1";
+				cmd.Repeat = broadLinkCmd.repeat;
+				return cmd;
+			}
+			return null;
 		}
 	}
 }

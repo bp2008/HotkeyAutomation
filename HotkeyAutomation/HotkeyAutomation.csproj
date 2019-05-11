@@ -47,9 +47,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BroadLinkRM\BroadLinkCmd.cs" />
     <Compile Include="BroadLinkRM\BroadLinkController.cs" />
+    <Compile Include="BroadLinkRM\BroadLinkCommands.cs" />
     <Compile Include="IRBlasters\Converter.cs" />
-    <Compile Include="IRBlasters\IRCommand.cs" />
+    <Compile Include="IRBlasters\IRCommands.cs" />
     <Compile Include="iTach\iTachCommands.cs" />
     <Compile Include="iTach\OneLineArraySerializer.cs" />
     <Compile Include="NamedItem.cs" />
@@ -73,6 +75,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="BroadLinkCommands.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="HotkeyAutomation_Install.sh" />
     <None Include="iTachCommands.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -82,7 +87,10 @@
     <None Include="packages.config" />
     <None Include="www\jsconfig.json" />
     <None Include="www\vues\App.vue" />
+    <None Include="www\vues\broadlink\BroadLinkCommandItem.vue" />
+    <None Include="www\vues\broadlink\BroadLinkCommandList.vue" />
     <None Include="www\vues\common\controls\VSelect.vue" />
+    <None Include="www\vues\common\dialogs\BroadLinkLearnCodesListener.vue" />
     <None Include="www\vues\common\dialogs\ModalDialog.vue" />
     <None Include="www\vues\common\dialogs\HotkeyListener.vue" />
     <None Include="www\vues\common\controls\Countdown.vue" />

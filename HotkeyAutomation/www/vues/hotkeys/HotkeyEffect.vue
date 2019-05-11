@@ -17,13 +17,13 @@
 			</div>
 			<div v-if="effect.type === EffectType.BroadLink" key="broadlink">
 				<label>BroadLink Name: <VSelect v-model="effect.data.broadlink_name" :options="broadlinkNameOptions" @change="edit" /></label>
-				<label>Command Name: <VSelect v-model="effect.data.broadlink_commandName" :options="itachCommandOptions" @change="edit" /></label>
+				<label>Command Name: <VSelect v-model="effect.data.broadlink_commandName" :options="broadlinkCommandOptions" @change="edit" /></label>
 				<label>Repeat Count: <input type="number" v-model.number="effect.data.broadlink_repeatCount" min="0" max="255" @change="edit" /></label>
 			</div>
 			<div v-else-if="effect.type === EffectType.iTach" key="itach">
 				<label>iTach Name: <VSelect v-model="effect.data.itach_name" :options="itachNameOptions" @change="edit" /></label>
 				<label>Connector Address: <input type="text" v-model="effect.data.itach_connectorAddress" @change="edit" placeholder="e.g. 1:1 or 1:2 or 1:3" /></label>
-				<label>Command Name: <VSelect v-model="effect.data.itach_commandShortName" :options="itachCommandOptions" @change="edit" /></label>
+				<label>Command Name: <VSelect v-model="effect.data.itach_commandShortName" :options="irCommandOptions" @change="edit" /></label>
 				<label>Repeat Count: <input type="number" v-model.number="effect.data.itach_repeatCount" min="0" max="50" @change="edit" /></label>
 			</div>
 			<div v-else-if="effect.type === EffectType.Vera" key="vera">
@@ -73,14 +73,19 @@
 				let data = this.$store.getters.GetCachedResponse("broadlink_names");
 				return this.SimpleItemList(data);
 			},
+			broadlinkCommandOptions()
+			{
+				let data = this.$store.getters.GetCachedResponse("broadlink_command_short_names");
+				return this.SimpleItemList(data);
+			},
 			itachNameOptions()
 			{
 				let data = this.$store.getters.GetCachedResponse("itach_names");
 				return this.SimpleItemList(data);
 			},
-			itachCommandOptions()
+			irCommandOptions()
 			{
-				let data = this.$store.getters.GetCachedResponse("itach_command_short_names");
+				let data = this.$store.getters.GetCachedResponse("ir_command_short_names");
 				return this.SimpleItemList(data);
 			},
 			veraNameOptions()

@@ -22,10 +22,12 @@ import HotkeyListItem from 'appRoot/vues/hotkeys/HotkeyListItem.vue';
 import iTachListItem from 'appRoot/vues/itach/iTachListItem.vue';
 import VeraListItem from 'appRoot/vues/vera/VeraListItem.vue';
 import BroadLinkListItem from 'appRoot/vues/broadlink/BroadLinkListItem.vue';
+import BroadLinkCommandItem from 'appRoot/vues/broadlink/BroadLinkCommandItem.vue';
 Vue.component('HotkeyListItem', HotkeyListItem);
 Vue.component('iTachListItem', iTachListItem);
 Vue.component('VeraListItem', VeraListItem);
 Vue.component('BroadLinkListItem', BroadLinkListItem);
+Vue.component('BroadLinkCommandItem', BroadLinkCommandItem);
 
 // Any recursively nested components must be globally registered here
 //Vue.component('Example', require('Example.vue').default);

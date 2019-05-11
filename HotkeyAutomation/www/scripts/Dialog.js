@@ -2,6 +2,7 @@
 const createModalDialog = create({ component: ModalDialogComponent, wrapper: 'dialogFade' });
 
 import HotkeyListener from 'appRoot/vues/common/dialogs/HotkeyListener.vue';
+import BroadLinkLearnCodesListener from 'appRoot/vues/common/dialogs/BroadLinkLearnCodesListener.vue';
 
 export function ModalDialog(contentComponent, contentProps)
 {
@@ -11,6 +12,16 @@ export function ModalDialog(contentComponent, contentProps)
 export function ModalHotkeyListener(hotkeyId)
 {
 	return ModalDialog(HotkeyListener, { hotkeyId });
+}
+/**
+ * Opens the "Learn BroadLink Command Codes" dialog.
+ * @param {Number} controllerId ID of the BroadLink Controller to use for learning.
+ * @param {Number} commandId Command ID
+ * @returns {Promise} Returns a promise which resolves when the dialog closes and does not reject.
+ */
+export function ModalBroadLinkLearnCodesListener(controllerId, commandId)
+{
+	return ModalDialog(BroadLinkLearnCodesListener, { controllerId, commandId });
 }
 
 /////////////////////////////////

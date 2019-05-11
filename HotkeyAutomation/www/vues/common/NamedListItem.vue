@@ -2,16 +2,19 @@
 	<div :class="{ itemRoot: true, deleting: deleting, working: working, isHotkey: isHotkey }">
 		<div class="topRow">
 			<input class="name" type="text" v-model="item.name" :placeholder="('Name this ' + itemType + '…')" @change="edit" />
-			<label v-if="!isHotkey">
+			<label v-if="!isHotkey && !isBroadlinkCmd">
 				Host:
 				<input class="host" type="text" v-model="item.host" placeholder="192.168.x.x" @change="edit" />
 			</label>
-			<label v-if="!isHotkey && includePort">
+			<label v-if="!isHotkey && !isBroadlinkCmd && includePort">
 				Port:
 				<input class="port" type="number" v-model.number="item.port" min="1" max="65535" :placeholder="portPlaceholder" @change="edit" />
 			</label>
 			<span v-if="isHotkey" title="Bind new key"><svg @click="hotkeyListen"><use xlink:href="#input"></use></svg></span>
 			<span v-if="isHotkey" class="keyReadout">{{item.keyName}}</span>
+			<span v-if="isBroadlinkCmd" title="Learn new codes"><svg @click="$emit('learnCodes')"><use xlink:href="#input"></use></svg></span>
+			<span v-if="isBroadlinkCmd" class="keyReadout">{{item.codes ? "Codes Learned" : ""}}</span>
+			<router-link v-if="isBroadlinkController" :to="{ name: 'broadlinkcmds', params: { controllerId: this.item.id } }">Manage Commands</router-link>
 			<div class="buttons">
 				<ScaleLoader :class="{ scaleLoader: true, visible: working }"></ScaleLoader>
 				<span title="Drag me!" class="listItem_dragHandle"><svg><use xlink:href="#arrows"></use></svg></span>
@@ -22,6 +25,15 @@
 			<draggable v-model="item.effects" @change="itemsChanged" :options="{ handle: '.hotkeyEffect_dragHandle' }">
 				<HotkeyEffect v-for="(effect, index) in item.effects" :key="index" :effect="effect" class="hotkeyEffect" @edit="edit" @delete="deleteEffect" />
 			</draggable>
+		</div>
+		<div v-if="isBroadlinkCmd">{{item.codes}}</div>
+		<div v-if="isBroadlinkCmd">
+			<span>Type: <b>{{item.type}}</b></span>
+			&nbsp; &nbsp;
+			<label>
+				Default Repeat Count (0-255):
+				<input type="number" v-model.number="item.repeat" min="0" max="255" placeholder="Repeat" @change="edit" />
+			</label>
 		</div>
 		<input v-if="isHotkey" type="button" value="Add Effect" @click="addEffect" class="addEffect" />
 	</div>
@@ -73,6 +85,14 @@
 			isHotkey()
 			{
 				return this.apiKey === "hotkey";
+			},
+			isBroadlinkCmd()
+			{
+				return this.apiKey === "broadlinkcmd";
+			},
+			isBroadlinkController()
+			{
+				return this.apiKey === "broadlink";
 			},
 			undoItems()
 			{
@@ -298,9 +318,9 @@
 		margin: 3px 0px 10px 0px;
 	}
 
-		.listItem_dragHandle svg
-		{
-			transform: rotate(90deg);
-			box-shadow: 1px -1px 3px rgba(0,0,0,0.5);
-		}
+	.listItem_dragHandle svg
+	{
+		transform: rotate(90deg);
+		box-shadow: 1px -1px 3px rgba(0,0,0,0.5);
+	}
 </style>

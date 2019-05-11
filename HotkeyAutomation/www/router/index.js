@@ -8,6 +8,7 @@ import HotkeyList from 'appRoot/vues/hotkeys/HotkeyList.vue';
 import iTachList from 'appRoot/vues/itach/iTachList.vue';
 import VeraList from 'appRoot/vues/vera/VeraList.vue';
 import BroadLinkList from 'appRoot/vues/broadlink/BroadLinkList.vue';
+import BroadLinkCommandList from 'appRoot/vues/broadlink/BroadLinkCommandList.vue';
 
 Vue.use(VueRouter);
 
@@ -50,6 +51,9 @@ export default function CreateRouter(store, basePath)
 						children: [
 							{ path: '', component: BroadLinkList, name: 'broadlinks' }
 						]
+					},
+					{
+						path: 'broadlinkcmds/:controllerId', component: BroadLinkCommandList, name: 'broadlinkcmds', props: true
 					}
 				]
 			}

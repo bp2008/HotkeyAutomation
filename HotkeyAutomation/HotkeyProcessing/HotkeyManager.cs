@@ -20,7 +20,7 @@ namespace HotkeyAutomation.HotkeyProcessing
 	public class HotkeyManager
 	{
 		/// <summary>
-		/// Keeps track of the state on the server.
+		/// Keeps track of the Hotkey Binding state on the server.
 		/// </summary>
 		private BindState _bindState = null;
 		private object GetLock()

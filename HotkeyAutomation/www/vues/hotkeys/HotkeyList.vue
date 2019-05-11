@@ -11,9 +11,10 @@
 		{
 			this.$store.dispatch("CacheApiResponse", "broadlink_names");
 			this.$store.dispatch("CacheApiResponse", "itach_names");
-			this.$store.dispatch("CacheApiResponse", "itach_command_short_names");
 			this.$store.dispatch("CacheApiResponse", "vera_names");
 			this.$store.dispatch("CacheApiResponse", "vera_command_list");
+			this.$store.dispatch("CacheApiResponse", "broadlink_command_short_names");
+			this.$store.dispatch("CacheApiResponse", "ir_command_short_names");
 		}
 	};
 </script>
