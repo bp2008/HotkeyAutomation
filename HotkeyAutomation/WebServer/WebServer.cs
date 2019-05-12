@@ -44,6 +44,30 @@ namespace HotkeyAutomation
 				{
 					p.writeFailure("405 Method Not Allowed", "json API requests must use the POST method");
 				}
+				else if (pageLower == "broadlinkcommands.json")
+				{
+					if (File.Exists(ServiceWrapper.BroadLinkCommandsFile))
+					{
+						byte[] content = File.ReadAllBytes(ServiceWrapper.BroadLinkCommandsFile);
+						p.writeSuccess("application/json", content.Length);
+						p.outputStream.Flush();
+						p.tcpStream.Write(content, 0, content.Length);
+					}
+					else
+						p.writeFailure();
+				}
+				else if (pageLower == "itachcommands.json")
+				{
+					if (File.Exists(ServiceWrapper.iTachCommandsFile))
+					{
+						byte[] content = File.ReadAllBytes(ServiceWrapper.iTachCommandsFile);
+						p.writeSuccess("application/json", content.Length);
+						p.outputStream.Flush();
+						p.tcpStream.Write(content, 0, content.Length);
+					}
+					else
+						p.writeFailure();
+				}
 				else
 				{
 					#region www
@@ -94,7 +118,7 @@ namespace HotkeyAutomation
 							return;
 						}
 					}
-					
+
 					if ((fi.Extension == ".html" || fi.Extension == ".htm") && fi.Length < 256000)
 					{
 						bet.Start("Write HTML");
