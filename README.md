@@ -22,3 +22,7 @@ The installation script will ask if you wish to install or uninstall.  Once inst
 ### Configuration
 
 Navigate a web browser to the IP address of your raspberry pi.  The HotkeyAutomation program has a built-in web server which listens by default on port 80.
+
+### Troubleshooting
+
+This application is currently not set up to handle browser caching properly.  If you update the application, please clear your browser caches to avoid errors when using the web interface.
