@@ -47,20 +47,20 @@ namespace HotkeyAutomation.HotkeyProcessing
 				Logger.Debug(ex, "Handling key " + ConsoleKeyHelper.GetKeyName(key));
 			}
 		}
-		public bool ExecuteHotkeyById(int id)
+		public string ExecuteHotkeyById(int id)
 		{
 			Hotkey hotkey = ServiceWrapper.config.hotkeys.Get(id);
 			if (hotkey == null)
-				return false;
+				return "Hotkey with id " + id + " was not found";
 			try
 			{
 				ExecuteHotkey(hotkey);
 			}
-			catch
+			catch(Exception ex)
 			{
-				return false;
+				return ex.ToString();
 			}
-			return true;
+			return null;
 		}
 
 		/// <summary>

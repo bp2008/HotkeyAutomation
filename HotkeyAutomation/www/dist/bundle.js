@@ -1528,15 +1528,11 @@ exports.default = {
 		executeHotkey: function executeHotkey(item) {
 			var _this5 = this;
 
-			(0, _api.ExecJSON)({ cmd: "execute", item: item }).then(function (data) {
+			(0, _api.ExecJSON)({ cmd: "executeHotkey", hotkeyId: item.id }).then(function (data) {
 				_this5.resetItemState(item);
 			}).catch(function (err) {
 				_this5.resetItemState(item);
 				toaster.error(err);
-				if (err.name === "ApiError" && err.data) {
-					var idxKey = _this5.items.indexOf(item);
-					if (idxKey > -1) _vue2.default.set(_this5.items, idxKey, err.data.data);
-				}
 			});
 		},
 		setupUndoDelete: function setupUndoDelete(item) {

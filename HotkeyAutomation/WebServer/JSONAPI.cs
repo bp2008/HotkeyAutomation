@@ -110,6 +110,16 @@ namespace HotkeyAutomation
 								response = new ResultFailWithReason("Unable to unbind hotkey. Please try again.");
 							break;
 						}
+					case "executeHotkey":
+						{
+							int hotkeyId = requestObj.hotkeyId;
+							string error = ServiceWrapper.hotkeyManager.ExecuteHotkeyById(hotkeyId);
+							if (error == null)
+								response = new ResultSuccess();
+							else
+								response = new ResultFailWithReason("Hotkey manual execution failed: " + error);
+							break;
+						}
 					#endregion
 					#region BroadLink
 					case "broadlink_reorder":
@@ -280,17 +290,6 @@ namespace HotkeyAutomation
 									Interlocked.Increment(ref failure);
 							});
 							response = new ResultWithData("Vera Command Loading complete. Successful loads: " + success + ". Failed loads: " + failure);
-							break;
-						}
-					#endregion
-					#region Execute Command Manually
-					case "execute":
-						{
-							int hotkeyId = requestObj.hotkeyId;
-							if (ServiceWrapper.hotkeyManager.ExecuteHotkeyById(hotkeyId))
-								response = new ResultFailWithReason("Hotkey manual execution failed");
-							else
-								response = new ResultSuccess();
 							break;
 						}
 					#endregion

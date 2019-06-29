@@ -124,7 +124,7 @@
 			},
 			executeHotkey(item)
 			{
-				ExecJSON({ cmd: "execute", item: item }).then(data =>
+				ExecJSON({ cmd: "executeHotkey", hotkeyId: item.id }).then(data =>
 				{
 					this.resetItemState(item);
 				}
@@ -132,12 +132,6 @@
 				{
 					this.resetItemState(item);
 					toaster.error(err);
-					if (err.name === "ApiError" && err.data)
-					{
-						let idxKey = this.items.indexOf(item);
-						if (idxKey > -1)
-							Vue.set(this.items, idxKey, err.data.data);
-					}
 				});
 			},
 			setupUndoDelete(item)
