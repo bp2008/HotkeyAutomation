@@ -283,6 +283,17 @@ namespace HotkeyAutomation
 							break;
 						}
 					#endregion
+					#region Execute Command Manually
+					case "execute":
+						{
+							int hotkeyId = requestObj.hotkeyId;
+							if (ServiceWrapper.hotkeyManager.ExecuteHotkeyById(hotkeyId))
+								response = new ResultFailWithReason("Hotkey manual execution failed");
+							else
+								response = new ResultSuccess();
+							break;
+						}
+					#endregion
 					default:
 						response = new ResultFail() { error = "command \"" + cmd + "\" not supported" };
 						break;

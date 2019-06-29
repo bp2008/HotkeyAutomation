@@ -35,7 +35,10 @@
 				<input type="number" v-model.number="item.repeat" min="0" max="255" placeholder="Repeat" @change="edit" />
 			</label>
 		</div>
-		<input v-if="isHotkey" type="button" value="Add Effect" @click="addEffect" class="addEffect" />
+		<div class="bottomButtons">
+			<input v-if="isHotkey" type="button" value="Add Effect" @click="addEffect" class="addEffect" />
+			<input v-if="isHotkey" type="button" value="Execute Hotkey Effects" @click="executeHotkey" class="executeHotkey" />
+		</div>
 	</div>
 </template>
 
@@ -142,6 +145,11 @@
 					this.item.effects = [];
 				this.item.effects.push(new Effect());
 				this.edit();
+			},
+			executeHotkey()
+			{
+				this.working = true;
+				this.$emit("executeHotkey", this.item);
 			},
 			deleteEffect(effect)
 			{
@@ -312,10 +320,20 @@
 			opacity: 1;
 		}
 
+	.bottomButtons
+	{
+		margin-top: 5px;
+	}
+
 	.hotkeyEffect,
 	.addEffect
 	{
 		margin: 3px 0px 10px 0px;
+	}
+
+	.executeHotkey
+	{
+		float: right;
 	}
 
 	.listItem_dragHandle svg

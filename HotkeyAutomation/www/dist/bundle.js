@@ -1525,34 +1525,48 @@ exports.default = {
 				}
 			});
 		},
-		setupUndoDelete: function setupUndoDelete(item) {
+		executeHotkey: function executeHotkey(item) {
 			var _this5 = this;
+
+			(0, _api.ExecJSON)({ cmd: "execute", item: item }).then(function (data) {
+				_this5.resetItemState(item);
+			}).catch(function (err) {
+				_this5.resetItemState(item);
+				toaster.error(err);
+				if (err.name === "ApiError" && err.data) {
+					var idxKey = _this5.items.indexOf(item);
+					if (idxKey > -1) _vue2.default.set(_this5.items, idxKey, err.data.data);
+				}
+			});
+		},
+		setupUndoDelete: function setupUndoDelete(item) {
+			var _this6 = this;
 
 			var undoItem = {};
 			undoItem.deletedItem = item;
 			undoItem.description = "Deleted " + item.name;
 			undoItem.undo = function () {
-				_this5.undoDelete(undoItem);
+				_this6.undoDelete(undoItem);
 			};
 			undoItem.expire = 6;
 			undoItem.expireTimeout = setTimeout(function () {
-				_this5.expireUndoItem(undoItem);
+				_this6.expireUndoItem(undoItem);
 			}, 6000);
 			this.undoItems.push(undoItem);
 		},
 		undoDelete: function undoDelete(undoItem) {
-			var _this6 = this;
+			var _this7 = this;
 
 			undoItem.expire = 0;
 			clearTimeout(undoItem.expireTimeout);
 			undoItem.expireTimeout = null;
 			// We must re-create this item. It will probably receive a new ID.
 			(0, _api.ExecJSON)({ cmd: this.apiKey + "_new" }).then(function (data) {
-				undoItem.deletedItem[_this6.idField] = data.data[_this6.idField];
+				undoItem.deletedItem[_this7.idField] = data.data[_this7.idField];
 				// Update the new item to match the delete one.
-				(0, _api.ExecJSON)({ cmd: _this6.apiKey + "_update", item: undoItem.deletedItem }).then(function (data) {
-					_this6.expireUndoItem(undoItem);
-					_this6.items.push(undoItem.deletedItem);
+				(0, _api.ExecJSON)({ cmd: _this7.apiKey + "_update", item: undoItem.deletedItem }).then(function (data) {
+					_this7.expireUndoItem(undoItem);
+					_this7.items.push(undoItem.deletedItem);
 				}).catch(function (err) {
 					toaster.error(err);
 				});
@@ -1577,14 +1591,14 @@ exports.default = {
 			}
 		},
 		itemsChanged: function itemsChanged(arg) {
-			var _this7 = this;
+			var _this8 = this;
 
 			if (arg.moved) {
 				var ids = this.items.map(function (item) {
 					return item.id;
 				});
 				(0, _api.ExecJSON)({ cmd: this.apiKey + "_reorder", ids: ids }).then(function (data) {
-					toaster.success(null, "Reordered " + _this7.itemType + " list", 1250);
+					toaster.success(null, "Reordered " + _this8.itemType + " list", 1250);
 				}).catch(function (err) {
 					toaster.error(err);
 				});
@@ -1735,6 +1749,10 @@ exports.default = {
 			this.item.effects.push(new _EffectData.Effect());
 			this.edit();
 		},
+		executeHotkey: function executeHotkey() {
+			this.working = true;
+			this.$emit("executeHotkey", this.item);
+		},
 		deleteEffect: function deleteEffect(effect) {
 			var idxKey = this.item.effects.indexOf(effect);
 			if (idxKey > -1) this.item.effects.splice(idxKey, 1);
@@ -1777,6 +1795,9 @@ exports.default = {
 	},
 	created: function created() {}
 }; //
+//
+//
+//
 //
 //
 //
@@ -29135,7 +29156,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.itemRoot[data-v-d8e36c1c]\n{\n\tborder-bottom: 1px solid #bfbfbf;\n\tpadding: 1px 5px;\n\toverflow: hidden;\n}\n.itemRoot[data-v-d8e36c1c]:last-child\n\t{\n\t\tborder-bottom: none;\n}\n.itemRoot.deleting[data-v-d8e36c1c]\n\t{\n\t\tfilter: blur(2px);\n}\n.itemRoot.working[data-v-d8e36c1c]\n\t{\n\t\tbackground-color: rgba(0,0,0,0.05);\n}\n.itemRoot.isHotkey[data-v-d8e36c1c]\n\t{\n\t\tpadding-top: 8px;\n\t\tpadding-bottom: 8px;\n\t\tbackground-color: rgba(0,0,0,0.05);\n}\n.itemRoot.isHotkey[data-v-d8e36c1c]:last-child\n\t\t{\n\t\t\tpadding-bottom: 1px;\n\t\t\tmargin-bottom: 0px;\n}\n.itemRoot.isHotkey[data-v-d8e36c1c]:first-child\n\t\t{\n\t\t\tpadding-top: 1px;\n}\n.itemRoot.isHotkey.working[data-v-d8e36c1c]\n\t\t{\n\t\t\tbackground-color: rgba(0,0,0,0.1);\n}\n.topRow[data-v-d8e36c1c]\n{\n\tdisplay: flex;\n\tflex-wrap: wrap;\n\talign-items: center;\n\tjustify-content: space-between;\n}\n.name[data-v-d8e36c1c]\n{\n\twidth: 250px;\n\tpadding-left: 3px;\n\tmargin: 5px 0px;\n}\nsvg[data-v-d8e36c1c]\n{\n\tmin-width: 40px;\n\tmin-height: 40px;\n\twidth: 40px;\n\theight: 40px;\n\tcursor: pointer;\n\tuser-select: none;\n\tmargin-left: 5px;\n\tborder: 1px solid #CCCCCC;\n\tborder-radius: 7px;\n\tbackground-color: rgba(0,0,0,0.1);\n\tfill: #000000;\n\tbox-shadow: 1px 1px 3px rgba(0,0,0,0.5);\n}\nsvg[data-v-d8e36c1c]:hover\n\t{\n\t\tbackground-color: rgba(0,0,0,0.05);\n}\nsvg[data-v-d8e36c1c]:active\n\t{\n\t\tbackground-color: #FFFFFF;\n}\nlabel[data-v-d8e36c1c]\n{\n\tmargin-bottom: 0px; /* Bootstrap sure is opinionated */\n\tmargin-left: 5px;\n}\n.keyReadout[data-v-d8e36c1c]\n{\n\tflex: 1 1 auto;\n\tmargin-left: 9px;\n}\n.buttons[data-v-d8e36c1c]\n{\n\tdisplay: flex;\n\talign-items: center;\n}\n.scaleLoader[data-v-d8e36c1c]\n{\n\topacity: 0;\n}\n.scaleLoader.visible[data-v-d8e36c1c]\n\t{\n\t\topacity: 1;\n}\n.hotkeyEffect[data-v-d8e36c1c],\n.addEffect[data-v-d8e36c1c]\n{\n\tmargin: 3px 0px 10px 0px;\n}\n.listItem_dragHandle svg[data-v-d8e36c1c]\n{\n\ttransform: rotate(90deg);\n\tbox-shadow: 1px -1px 3px rgba(0,0,0,0.5);\n}\n", ""]);
+exports.push([module.i, "\n.itemRoot[data-v-d8e36c1c]\n{\n\tborder-bottom: 1px solid #bfbfbf;\n\tpadding: 1px 5px;\n\toverflow: hidden;\n}\n.itemRoot[data-v-d8e36c1c]:last-child\n\t{\n\t\tborder-bottom: none;\n}\n.itemRoot.deleting[data-v-d8e36c1c]\n\t{\n\t\tfilter: blur(2px);\n}\n.itemRoot.working[data-v-d8e36c1c]\n\t{\n\t\tbackground-color: rgba(0,0,0,0.05);\n}\n.itemRoot.isHotkey[data-v-d8e36c1c]\n\t{\n\t\tpadding-top: 8px;\n\t\tpadding-bottom: 8px;\n\t\tbackground-color: rgba(0,0,0,0.05);\n}\n.itemRoot.isHotkey[data-v-d8e36c1c]:last-child\n\t\t{\n\t\t\tpadding-bottom: 1px;\n\t\t\tmargin-bottom: 0px;\n}\n.itemRoot.isHotkey[data-v-d8e36c1c]:first-child\n\t\t{\n\t\t\tpadding-top: 1px;\n}\n.itemRoot.isHotkey.working[data-v-d8e36c1c]\n\t\t{\n\t\t\tbackground-color: rgba(0,0,0,0.1);\n}\n.topRow[data-v-d8e36c1c]\n{\n\tdisplay: flex;\n\tflex-wrap: wrap;\n\talign-items: center;\n\tjustify-content: space-between;\n}\n.name[data-v-d8e36c1c]\n{\n\twidth: 250px;\n\tpadding-left: 3px;\n\tmargin: 5px 0px;\n}\nsvg[data-v-d8e36c1c]\n{\n\tmin-width: 40px;\n\tmin-height: 40px;\n\twidth: 40px;\n\theight: 40px;\n\tcursor: pointer;\n\tuser-select: none;\n\tmargin-left: 5px;\n\tborder: 1px solid #CCCCCC;\n\tborder-radius: 7px;\n\tbackground-color: rgba(0,0,0,0.1);\n\tfill: #000000;\n\tbox-shadow: 1px 1px 3px rgba(0,0,0,0.5);\n}\nsvg[data-v-d8e36c1c]:hover\n\t{\n\t\tbackground-color: rgba(0,0,0,0.05);\n}\nsvg[data-v-d8e36c1c]:active\n\t{\n\t\tbackground-color: #FFFFFF;\n}\nlabel[data-v-d8e36c1c]\n{\n\tmargin-bottom: 0px; /* Bootstrap sure is opinionated */\n\tmargin-left: 5px;\n}\n.keyReadout[data-v-d8e36c1c]\n{\n\tflex: 1 1 auto;\n\tmargin-left: 9px;\n}\n.buttons[data-v-d8e36c1c]\n{\n\tdisplay: flex;\n\talign-items: center;\n}\n.scaleLoader[data-v-d8e36c1c]\n{\n\topacity: 0;\n}\n.scaleLoader.visible[data-v-d8e36c1c]\n\t{\n\t\topacity: 1;\n}\n.bottomButtons[data-v-d8e36c1c]\n{\n\tmargin-top: 5px;\n}\n.hotkeyEffect[data-v-d8e36c1c],\n.addEffect[data-v-d8e36c1c]\n{\n\tmargin: 3px 0px 10px 0px;\n}\n.executeHotkey[data-v-d8e36c1c]\n{\n\tfloat: right;\n}\n.listItem_dragHandle svg[data-v-d8e36c1c]\n{\n\ttransform: rotate(90deg);\n\tbox-shadow: 1px -1px 3px rgba(0,0,0,0.5);\n}\n", ""]);
 
 // exports
 
@@ -39258,7 +39279,11 @@ var render = function() {
                             tag: "component",
                             staticClass: "item",
                             attrs: { item: item },
-                            on: { delete: _vm.deleteItem, edit: _vm.editItem }
+                            on: {
+                              delete: _vm.deleteItem,
+                              edit: _vm.editItem,
+                              executeHotkey: _vm.executeHotkey
+                            }
                           })
                         })
                       )
@@ -39559,13 +39584,23 @@ var render = function() {
           ])
         : _vm._e(),
       _vm._v(" "),
-      _vm.isHotkey
-        ? _c("input", {
-            staticClass: "addEffect",
-            attrs: { type: "button", value: "Add Effect" },
-            on: { click: _vm.addEffect }
-          })
-        : _vm._e()
+      _c("div", { staticClass: "bottomButtons" }, [
+        _vm.isHotkey
+          ? _c("input", {
+              staticClass: "addEffect",
+              attrs: { type: "button", value: "Add Effect" },
+              on: { click: _vm.addEffect }
+            })
+          : _vm._e(),
+        _vm._v(" "),
+        _vm.isHotkey
+          ? _c("input", {
+              staticClass: "executeHotkey",
+              attrs: { type: "button", value: "Execute Hotkey Effects" },
+              on: { click: _vm.executeHotkey }
+            })
+          : _vm._e()
+      ])
     ]
   )
 }

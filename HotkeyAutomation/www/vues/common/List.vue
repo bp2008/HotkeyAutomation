@@ -8,7 +8,7 @@
 			</div>
 			<div ref="itemList" class="itemList" v-if="items.length > 0">
 				<draggable v-model="items" @change="itemsChanged" :options="{ handle: '.listItem_dragHandle' }">
-					<component :is="componentName" class="item" v-for="item in items" :key="item[idField]" :item="item" @delete="deleteItem" @edit="editItem" ref="listItems" />
+					<component :is="componentName" class="item" v-for="item in items" :key="item[idField]" :item="item" @delete="deleteItem" @edit="editItem" @executeHotkey="executeHotkey" ref="listItems" />
 				</draggable>
 			</div>
 			<UndoStack :items="undoItems" />
@@ -107,6 +107,24 @@
 			editItem(item)
 			{
 				ExecJSON({ cmd: this.apiKey + "_update", item: item }).then(data =>
+				{
+					this.resetItemState(item);
+				}
+				).catch(err =>
+				{
+					this.resetItemState(item);
+					toaster.error(err);
+					if (err.name === "ApiError" && err.data)
+					{
+						let idxKey = this.items.indexOf(item);
+						if (idxKey > -1)
+							Vue.set(this.items, idxKey, err.data.data);
+					}
+				});
+			},
+			executeHotkey(item)
+			{
+				ExecJSON({ cmd: "execute", item: item }).then(data =>
 				{
 					this.resetItemState(item);
 				}
