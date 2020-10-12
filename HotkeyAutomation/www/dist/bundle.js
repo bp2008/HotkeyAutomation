@@ -2658,7 +2658,7 @@ exports.default = {
 		},
 		SimpleItemList: function SimpleItemList(data) {
 			var options = [];
-			for (var i = 0; i < data.length; i++) {
+			for (var i = 0; data && i < data.length; i++) {
 				options.push({ Value: data[i], Text: data[i] });
 			}return options;
 		}
@@ -40147,157 +40147,44 @@ var render = function() {
                   })
                 ])
               ])
-            : _vm._e(),
-          _vm._v(" "),
-          _vm.effect.type === _vm.EffectType.BroadLink
-            ? _c("div", { key: "broadlink" }, [
-                _c(
-                  "label",
-                  [
-                    _vm._v("BroadLink Name: "),
-                    _c("VSelect", {
-                      attrs: { options: _vm.broadlinkNameOptions },
-                      on: { change: _vm.edit },
-                      model: {
-                        value: _vm.effect.data.broadlink_name,
-                        callback: function($$v) {
-                          _vm.$set(_vm.effect.data, "broadlink_name", $$v)
-                        },
-                        expression: "effect.data.broadlink_name"
-                      }
-                    })
-                  ],
-                  1
-                ),
-                _vm._v(" "),
-                _c(
-                  "label",
-                  [
-                    _vm._v("Command Name: "),
-                    _c("VSelect", {
-                      attrs: { options: _vm.broadlinkCommandOptions },
-                      on: { change: _vm.edit },
-                      model: {
-                        value: _vm.effect.data.broadlink_commandName,
-                        callback: function($$v) {
-                          _vm.$set(
-                            _vm.effect.data,
-                            "broadlink_commandName",
-                            $$v
-                          )
-                        },
-                        expression: "effect.data.broadlink_commandName"
-                      }
-                    })
-                  ],
-                  1
-                ),
-                _vm._v(" "),
-                _c("label", [
-                  _vm._v("Repeat Count: "),
-                  _c("input", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model.number",
-                        value: _vm.effect.data.broadlink_repeatCount,
-                        expression: "effect.data.broadlink_repeatCount",
-                        modifiers: { number: true }
-                      }
-                    ],
-                    attrs: { type: "number", min: "0", max: "255" },
-                    domProps: { value: _vm.effect.data.broadlink_repeatCount },
-                    on: {
-                      change: _vm.edit,
-                      input: function($event) {
-                        if ($event.target.composing) {
-                          return
-                        }
-                        _vm.$set(
-                          _vm.effect.data,
-                          "broadlink_repeatCount",
-                          _vm._n($event.target.value)
-                        )
-                      },
-                      blur: function($event) {
-                        _vm.$forceUpdate()
-                      }
-                    }
-                  })
-                ])
-              ])
-            : _vm.effect.type === _vm.EffectType.iTach
-              ? _c("div", { key: "itach" }, [
+            : _vm.effect.type === _vm.EffectType.BroadLink
+              ? _c("div", { key: "broadlink" }, [
                   _c(
                     "label",
                     [
-                      _vm._v("iTach Name: "),
+                      _vm._v("BroadLink Name: "),
                       _c("VSelect", {
-                        attrs: { options: _vm.itachNameOptions },
+                        attrs: { options: _vm.broadlinkNameOptions },
                         on: { change: _vm.edit },
                         model: {
-                          value: _vm.effect.data.itach_name,
+                          value: _vm.effect.data.broadlink_name,
                           callback: function($$v) {
-                            _vm.$set(_vm.effect.data, "itach_name", $$v)
+                            _vm.$set(_vm.effect.data, "broadlink_name", $$v)
                           },
-                          expression: "effect.data.itach_name"
+                          expression: "effect.data.broadlink_name"
                         }
                       })
                     ],
                     1
                   ),
                   _vm._v(" "),
-                  _c("label", [
-                    _vm._v("Connector Address: "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.effect.data.itach_connectorAddress,
-                          expression: "effect.data.itach_connectorAddress"
-                        }
-                      ],
-                      attrs: {
-                        type: "text",
-                        placeholder: "e.g. 1:1 or 1:2 or 1:3"
-                      },
-                      domProps: {
-                        value: _vm.effect.data.itach_connectorAddress
-                      },
-                      on: {
-                        change: _vm.edit,
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.$set(
-                            _vm.effect.data,
-                            "itach_connectorAddress",
-                            $event.target.value
-                          )
-                        }
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
                   _c(
                     "label",
                     [
                       _vm._v("Command Name: "),
                       _c("VSelect", {
-                        attrs: { options: _vm.irCommandOptions },
+                        attrs: { options: _vm.broadlinkCommandOptions },
                         on: { change: _vm.edit },
                         model: {
-                          value: _vm.effect.data.itach_commandShortName,
+                          value: _vm.effect.data.broadlink_commandName,
                           callback: function($$v) {
                             _vm.$set(
                               _vm.effect.data,
-                              "itach_commandShortName",
+                              "broadlink_commandName",
                               $$v
                             )
                           },
-                          expression: "effect.data.itach_commandShortName"
+                          expression: "effect.data.broadlink_commandName"
                         }
                       })
                     ],
@@ -40311,13 +40198,15 @@ var render = function() {
                         {
                           name: "model",
                           rawName: "v-model.number",
-                          value: _vm.effect.data.itach_repeatCount,
-                          expression: "effect.data.itach_repeatCount",
+                          value: _vm.effect.data.broadlink_repeatCount,
+                          expression: "effect.data.broadlink_repeatCount",
                           modifiers: { number: true }
                         }
                       ],
-                      attrs: { type: "number", min: "0", max: "50" },
-                      domProps: { value: _vm.effect.data.itach_repeatCount },
+                      attrs: { type: "number", min: "0", max: "255" },
+                      domProps: {
+                        value: _vm.effect.data.broadlink_repeatCount
+                      },
                       on: {
                         change: _vm.edit,
                         input: function($event) {
@@ -40326,7 +40215,7 @@ var render = function() {
                           }
                           _vm.$set(
                             _vm.effect.data,
-                            "itach_repeatCount",
+                            "broadlink_repeatCount",
                             _vm._n($event.target.value)
                           )
                         },
@@ -40337,59 +40226,21 @@ var render = function() {
                     })
                   ])
                 ])
-              : _vm.effect.type === _vm.EffectType.Vera
-                ? _c("div", { key: "vera" }, [
+              : _vm.effect.type === _vm.EffectType.iTach
+                ? _c("div", { key: "itach" }, [
                     _c(
                       "label",
                       [
-                        _vm._v("Vera Name: "),
+                        _vm._v("iTach Name: "),
                         _c("VSelect", {
-                          attrs: { options: _vm.veraNameOptions },
+                          attrs: { options: _vm.itachNameOptions },
                           on: { change: _vm.edit },
                           model: {
-                            value: _vm.effect.data.vera_name,
+                            value: _vm.effect.data.itach_name,
                             callback: function($$v) {
-                              _vm.$set(_vm.effect.data, "vera_name", $$v)
+                              _vm.$set(_vm.effect.data, "itach_name", $$v)
                             },
-                            expression: "effect.data.vera_name"
-                          }
-                        })
-                      ],
-                      1
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "label",
-                      [
-                        _vm._v("Device: "),
-                        _c("VSelect", {
-                          attrs: { options: _vm.veraDeviceOptions },
-                          on: { change: _vm.edit },
-                          model: {
-                            value: _vm.effect.data.vera_deviceNum,
-                            callback: function($$v) {
-                              _vm.$set(_vm.effect.data, "vera_deviceNum", $$v)
-                            },
-                            expression: "effect.data.vera_deviceNum"
-                          }
-                        })
-                      ],
-                      1
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "label",
-                      [
-                        _vm._v("\n\t\t\t\tService Type:\n\t\t\t\t"),
-                        _c("VSelect", {
-                          attrs: { options: _vm.veraServices },
-                          on: { change: _vm.edit },
-                          model: {
-                            value: _vm.effect.data.vera_service,
-                            callback: function($$v) {
-                              _vm.$set(_vm.effect.data, "vera_service", $$v)
-                            },
-                            expression: "effect.data.vera_service"
+                            expression: "effect.data.itach_name"
                           }
                         })
                       ],
@@ -40397,18 +40248,23 @@ var render = function() {
                     ),
                     _vm._v(" "),
                     _c("label", [
-                      _vm._v("Value: "),
+                      _vm._v("Connector Address: "),
                       _c("input", {
                         directives: [
                           {
                             name: "model",
                             rawName: "v-model",
-                            value: _vm.effect.data.vera_value,
-                            expression: "effect.data.vera_value"
+                            value: _vm.effect.data.itach_connectorAddress,
+                            expression: "effect.data.itach_connectorAddress"
                           }
                         ],
-                        attrs: { type: "text" },
-                        domProps: { value: _vm.effect.data.vera_value },
+                        attrs: {
+                          type: "text",
+                          placeholder: "e.g. 1:1 or 1:2 or 1:3"
+                        },
+                        domProps: {
+                          value: _vm.effect.data.itach_connectorAddress
+                        },
                         on: {
                           change: _vm.edit,
                           input: function($event) {
@@ -40417,21 +40273,165 @@ var render = function() {
                             }
                             _vm.$set(
                               _vm.effect.data,
-                              "vera_value",
+                              "itach_connectorAddress",
                               $event.target.value
                             )
                           }
                         }
                       })
+                    ]),
+                    _vm._v(" "),
+                    _c(
+                      "label",
+                      [
+                        _vm._v("Command Name: "),
+                        _c("VSelect", {
+                          attrs: { options: _vm.irCommandOptions },
+                          on: { change: _vm.edit },
+                          model: {
+                            value: _vm.effect.data.itach_commandShortName,
+                            callback: function($$v) {
+                              _vm.$set(
+                                _vm.effect.data,
+                                "itach_commandShortName",
+                                $$v
+                              )
+                            },
+                            expression: "effect.data.itach_commandShortName"
+                          }
+                        })
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c("label", [
+                      _vm._v("Repeat Count: "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model.number",
+                            value: _vm.effect.data.itach_repeatCount,
+                            expression: "effect.data.itach_repeatCount",
+                            modifiers: { number: true }
+                          }
+                        ],
+                        attrs: { type: "number", min: "0", max: "50" },
+                        domProps: { value: _vm.effect.data.itach_repeatCount },
+                        on: {
+                          change: _vm.edit,
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.effect.data,
+                              "itach_repeatCount",
+                              _vm._n($event.target.value)
+                            )
+                          },
+                          blur: function($event) {
+                            _vm.$forceUpdate()
+                          }
+                        }
+                      })
                     ])
                   ])
-                : _c("div", { key: "unknownEffectType" }, [
-                    _vm._v(
-                      "\n\t\t\tUnknown Effect Type: " +
-                        _vm._s(_vm.effect.type) +
-                        "\n\t\t"
-                    )
-                  ])
+                : _vm.effect.type === _vm.EffectType.Vera
+                  ? _c("div", { key: "vera" }, [
+                      _c(
+                        "label",
+                        [
+                          _vm._v("Vera Name: "),
+                          _c("VSelect", {
+                            attrs: { options: _vm.veraNameOptions },
+                            on: { change: _vm.edit },
+                            model: {
+                              value: _vm.effect.data.vera_name,
+                              callback: function($$v) {
+                                _vm.$set(_vm.effect.data, "vera_name", $$v)
+                              },
+                              expression: "effect.data.vera_name"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "label",
+                        [
+                          _vm._v("Device: "),
+                          _c("VSelect", {
+                            attrs: { options: _vm.veraDeviceOptions },
+                            on: { change: _vm.edit },
+                            model: {
+                              value: _vm.effect.data.vera_deviceNum,
+                              callback: function($$v) {
+                                _vm.$set(_vm.effect.data, "vera_deviceNum", $$v)
+                              },
+                              expression: "effect.data.vera_deviceNum"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "label",
+                        [
+                          _vm._v("\n\t\t\t\tService Type:\n\t\t\t\t"),
+                          _c("VSelect", {
+                            attrs: { options: _vm.veraServices },
+                            on: { change: _vm.edit },
+                            model: {
+                              value: _vm.effect.data.vera_service,
+                              callback: function($$v) {
+                                _vm.$set(_vm.effect.data, "vera_service", $$v)
+                              },
+                              expression: "effect.data.vera_service"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c("label", [
+                        _vm._v("Value: "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.effect.data.vera_value,
+                              expression: "effect.data.vera_value"
+                            }
+                          ],
+                          attrs: { type: "text" },
+                          domProps: { value: _vm.effect.data.vera_value },
+                          on: {
+                            change: _vm.edit,
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.effect.data,
+                                "vera_value",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        })
+                      ])
+                    ])
+                  : _c("div", { key: "unknownEffectType" }, [
+                      _vm._v(
+                        "\n\t\t\tUnknown Effect Type: " +
+                          _vm._s(_vm.effect.type) +
+                          "\n\t\t"
+                      )
+                    ])
         ])
       : _vm._e()
   ])

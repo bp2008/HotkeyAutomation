@@ -15,7 +15,7 @@
 			<div v-if="effect.type === EffectType.HttpGet" key="httpget">
 				<label class="wide">URL: <input type="text" v-model="effect.data.httpget_url" @change="edit" /></label>
 			</div>
-			<div v-if="effect.type === EffectType.BroadLink" key="broadlink">
+			<div v-else-if="effect.type === EffectType.BroadLink" key="broadlink">
 				<label>BroadLink Name: <VSelect v-model="effect.data.broadlink_name" :options="broadlinkNameOptions" @change="edit" /></label>
 				<label>Command Name: <VSelect v-model="effect.data.broadlink_commandName" :options="broadlinkCommandOptions" @change="edit" /></label>
 				<label>Repeat Count: <input type="number" v-model.number="effect.data.broadlink_repeatCount" min="0" max="255" @change="edit" /></label>
@@ -143,7 +143,7 @@
 			SimpleItemList(data)
 			{
 				let options = [];
-				for (let i = 0; i < data.length; i++)
+				for (let i = 0; data && i < data.length; i++)
 					options.push({ Value: data[i], Text: data[i] });
 				return options;
 			}
