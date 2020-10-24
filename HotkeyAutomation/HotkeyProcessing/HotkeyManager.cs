@@ -56,7 +56,7 @@ namespace HotkeyAutomation.HotkeyProcessing
 			{
 				ExecuteHotkey(hotkey);
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				return ex.ToString();
 			}
@@ -132,7 +132,9 @@ namespace HotkeyAutomation.HotkeyProcessing
 		/// <param name="key"></param>
 		private void TriggerHotkeys(int key)
 		{
-			Parallel.ForEach(ServiceWrapper.config.GetHotkeysByKey(key), hotkey =>
+			ParallelOptions parallelOptions = new ParallelOptions();
+			parallelOptions.MaxDegreeOfParallelism = 16;
+			Parallel.ForEach(ServiceWrapper.config.GetHotkeysByKey(key), parallelOptions, hotkey =>
 			{
 				Logger.Info("Trigger: " + hotkey.name);
 				if (hotkey.effects == null || hotkey.effects.Length == 0)
@@ -143,7 +145,9 @@ namespace HotkeyAutomation.HotkeyProcessing
 
 		private static void ExecuteHotkey(Hotkey hotkey)
 		{
-			foreach (Effect effect in hotkey.effects)
+			ParallelOptions parallelOptions = new ParallelOptions();
+			parallelOptions.MaxDegreeOfParallelism = 16;
+			Parallel.ForEach(hotkey.effects, parallelOptions, effect =>
 			{
 				switch (effect.type)
 				{
@@ -190,7 +194,7 @@ namespace HotkeyAutomation.HotkeyProcessing
 						ServiceWrapper.ErrorWriteLine("Unhandled hotkey effect type: " + effect.type + " in hotkey with name \"" + hotkey.name + "\"");
 						break;
 				}
-			};
+			});
 		}
 
 		/// <summary>
