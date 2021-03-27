@@ -25,14 +25,29 @@ namespace HotkeyAutomation
 					unixKeyListener = new AllKeyboardListener(5000);
 					unixKeyListener.KeyDownEvent += UnixKeyListener_KeyDownEvent;
 				}
-				Console.WriteLine("CTRL + C to exit");
+				bool exit = false;
+				Console.CancelKeyPress += (sender, e) =>
+				{
+					exit = true;
+					e.Cancel = true;
+				};
 				while (true)
 				{
+					while (!Console.KeyAvailable && !exit)
+						Thread.Sleep(1);
+					if (exit)
+					{
+						Console.Write("Exiting");
+						break;
+					}
 					ConsoleKeyInfo cki = Console.ReadKey(true);
+					if (cki.Modifiers == ConsoleModifiers.Control && (cki.Key == ConsoleKey.C || cki.Key == ConsoleKey.Pause))
+					{
+						Console.Write("Exiting");
+						break;
+					}
 					if (!unix)
 						ServiceWrapper.hotkeyManager.NotifyKeyPressed((int)cki.Key);
-					if (cki.Key == ConsoleKey.C && cki.Modifiers == ConsoleModifiers.Control)
-						break;
 				}
 			}
 			catch (ThreadAbortException) { }
@@ -43,6 +58,7 @@ namespace HotkeyAutomation
 			finally
 			{
 				ServiceWrapper.Stop();
+				Console.WriteLine("...");
 			}
 		}
 

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using BPUtil;
@@ -61,6 +62,7 @@ namespace HotkeyAutomation.Vera
 				}
 				http_fast.GET(BaseUrl() + "/port_3480/data_request?id=lu_action&output_format=json&DeviceNum=" + effect.vera_deviceNum + "&serviceId=urn:upnp-org:serviceId:" + args);
 			}
+			catch (ThreadAbortException) { }
 			catch (Exception ex)
 			{
 				Logger.Debug(ex.ToString());
@@ -132,6 +134,7 @@ namespace HotkeyAutomation.Vera
 							}
 							return true;
 						}
+						catch (ThreadAbortException) { }
 						catch (Exception ex)
 						{
 							Logger.Debug(ex, "Error getting data from vera \"" + BaseUrl() + "\"");
