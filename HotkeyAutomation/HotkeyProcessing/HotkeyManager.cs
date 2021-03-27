@@ -19,6 +19,8 @@ namespace HotkeyAutomation.HotkeyProcessing
 	/// </summary>
 	public class HotkeyManager
 	{
+		private static WebRequestUtility http_fast = new WebRequestUtility("HotkeyAutomation " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(), 5000);
+
 		/// <summary>
 		/// Keeps track of the Hotkey Binding state on the server.
 		/// </summary>
@@ -154,7 +156,7 @@ namespace HotkeyAutomation.HotkeyProcessing
 					case EffectType.HttpGet:
 						{
 							if (!string.IsNullOrWhiteSpace(effect.data.httpget_url) && Uri.TryCreate(effect.data.httpget_url, UriKind.Absolute, out Uri result))
-								ServiceWrapper.http.GET(effect.data.httpget_url);
+								http_fast.GET(effect.data.httpget_url);
 							break;
 						}
 					case EffectType.BroadLink:
@@ -162,7 +164,7 @@ namespace HotkeyAutomation.HotkeyProcessing
 							BroadLinkController broadLink = ServiceWrapper.config.broadLinks.Get(effect.data.broadlink_name);
 							if (broadLink == null)
 							{
-								Logger.Debug("BroadLink \"" + effect.data.broadlink_name + "\" does not exist.");
+								Logger.Info("BroadLink \"" + effect.data.broadlink_name + "\" does not exist.");
 								break;
 							}
 							broadLink.SendCommandSync(effect.data.broadlink_commandName, effect.data.broadlink_repeatCount);
@@ -173,7 +175,7 @@ namespace HotkeyAutomation.HotkeyProcessing
 							iTachController iTach = ServiceWrapper.config.iTachs.Get(effect.data.itach_name);
 							if (iTach == null)
 							{
-								Logger.Debug("iTach \"" + effect.data.itach_name + "\" does not exist.");
+								Logger.Info("iTach \"" + effect.data.itach_name + "\" does not exist.");
 								break;
 							}
 							iTach.SendCommandSync(effect.data.itach_commandShortName, effect.data.itach_connectorAddress, effect.data.itach_repeatCount);
@@ -184,14 +186,14 @@ namespace HotkeyAutomation.HotkeyProcessing
 							VeraController vera = ServiceWrapper.config.veras.Get(effect.data.vera_name);
 							if (vera == null)
 							{
-								Logger.Debug("Vera \"" + effect.data.vera_name + "\" does not exist.");
+								Logger.Info("Vera \"" + effect.data.vera_name + "\" does not exist.");
 								break;
 							}
 							vera.Send(effect.data);
 							break;
 						}
 					default:
-						ServiceWrapper.ErrorWriteLine("Unhandled hotkey effect type: " + effect.type + " in hotkey with name \"" + hotkey.name + "\"");
+						Logger.Info("Unhandled hotkey effect type: " + effect.type + " in hotkey with name \"" + hotkey.name + "\"");
 						break;
 				}
 			});

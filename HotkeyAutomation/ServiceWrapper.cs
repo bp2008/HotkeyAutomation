@@ -16,7 +16,6 @@ namespace HotkeyAutomation
 		public static HotkeyConfig config;
 		public static HotkeyManager hotkeyManager;
 		private static WebServer httpServer;
-		public static WebRequestUtility http;
 		public static StreamingLogReader logReader;
 		public static string iTachCommandsFile = "";
 		public static string BroadLinkCommandsFile = "";
@@ -61,8 +60,6 @@ namespace HotkeyAutomation
 				thr.Start();
 			}
 
-			http = new WebRequestUtility("HotkeyAutomation " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(), 5000);
-
 			httpServer = new WebServer(config.httpPort);
 			httpServer.SocketBound += HttpServer_SocketBound;
 		}
@@ -96,23 +93,6 @@ namespace HotkeyAutomation
 		{
 			Try.Catch(() => { httpServer?.Stop(); });
 			Try.Catch(Logger.StopLoggingThreads);
-		}
-
-		public static void Write(string text)
-		{
-			Console.Write(text);
-		}
-		public static void WriteLine(string text)
-		{
-			Console.WriteLine(text);
-		}
-		public static void ErrorWrite(string text)
-		{
-			Console.Error.Write(text);
-		}
-		public static void ErrorWriteLine(string text)
-		{
-			Console.Error.WriteLine(text);
 		}
 	}
 }

@@ -12,6 +12,8 @@ namespace HotkeyAutomation.Vera
 {
 	public class VeraController : NamedItem
 	{
+		private static WebRequestUtility http_slow = new WebRequestUtility("HotkeyAutomation " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(), 20000);
+		private static WebRequestUtility http_fast = new WebRequestUtility("HotkeyAutomation " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(), 5000);
 		// public string name; // Inherited from NamedItem
 		public string host;
 		public int? port;
@@ -57,7 +59,7 @@ namespace HotkeyAutomation.Vera
 					Logger.Debug("VeraController does not know how to handle service type \"" + effect.vera_service + "\"");
 					return;
 				}
-				ServiceWrapper.http.GET(BaseUrl() + "/port_3480/data_request?id=lu_action&output_format=json&DeviceNum=" + effect.vera_deviceNum + "&serviceId=urn:upnp-org:serviceId:" + args);
+				http_fast.GET(BaseUrl() + "/port_3480/data_request?id=lu_action&output_format=json&DeviceNum=" + effect.vera_deviceNum + "&serviceId=urn:upnp-org:serviceId:" + args);
 			}
 			catch (Exception ex)
 			{
@@ -102,7 +104,7 @@ namespace HotkeyAutomation.Vera
 						ConcurrentDictionary<int, string> map = new ConcurrentDictionary<int, string>();
 						try
 						{
-							BpWebResponse response = ServiceWrapper.http.GET(BaseUrl() + "/port_3480/data_request?id=user_data&output_format=xml");
+							BpWebResponse response = http_slow.GET(BaseUrl() + "/port_3480/data_request?id=user_data&output_format=xml");
 							string xmlStr = response.str;
 							XDocument doc = XDocument.Parse(xmlStr);
 							var rooms = doc.Descendants("rooms").First().Descendants("room")
@@ -132,7 +134,7 @@ namespace HotkeyAutomation.Vera
 						}
 						catch (Exception ex)
 						{
-							ServiceWrapper.ErrorWriteLine(ex.ToString());
+							Logger.Debug(ex, "Error getting data from vera \"" + BaseUrl() + "\"");
 						}
 						finally
 						{
