@@ -13,6 +13,7 @@
 				<b-nav-item :to="{ name: 'itachs' }">iTach Controllers</b-nav-item>
 				<b-nav-item :to="{ name: 'veras' }">Vera Controllers</b-nav-item>
 				<b-nav-item :to="{ name: 'broadlinks' }">BroadLink Controllers</b-nav-item>
+				<b-nav-item :to="{ name: 'system' }">System</b-nav-item>
 			</b-navbar-nav>
 
 		</b-collapse>

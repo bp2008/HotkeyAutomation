@@ -68,6 +68,15 @@ namespace HotkeyAutomation
 					else
 						p.writeFailure();
 				}
+				else if (pageLower == "downloadconfiguration")
+				{
+					string filename = "HotkeyAutomationConfig_" + Environment.MachineName + "_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".zip";
+					List<KeyValuePair<string, string>> additionalHeaders = new List<KeyValuePair<string, string>>();
+					additionalHeaders.Add(new KeyValuePair<string, string>("Content-Disposition", "attachment; filename=\"" + filename + "\""));
+					p.writeSuccess("application/zip", additionalHeaders: additionalHeaders);
+					p.outputStream.Flush();
+					ConfigurationIO.WriteToStream(p.tcpStream);
+				}
 				else
 				{
 					#region www
@@ -196,6 +205,30 @@ namespace HotkeyAutomation
 			if (pageLower == "json")
 			{
 				JSONAPI.HandleRequest(p, inputData.ReadToEnd());
+			}
+			else if (pageLower == "uploadconfiguration")
+			{
+				bool success = ConfigurationIO.ReadFromStream(p.PostBodyStream);
+				p.writeSuccess("text/plain", 1);
+				p.outputStream.Write(success ? "1" : "0");
+				if (success)
+				{
+					Thread thrRestartSelf = new Thread(() =>
+					{
+						try
+						{
+							Thread.Sleep(1000);
+							Program.restartNow = true;
+						}
+						catch (Exception ex)
+						{
+							Logger.Debug(ex);
+						}
+					});
+					thrRestartSelf.Name = "Restart Self";
+					thrRestartSelf.IsBackground = true;
+					thrRestartSelf.Start();
+				}
 			}
 		}
 		protected override void stopServer()

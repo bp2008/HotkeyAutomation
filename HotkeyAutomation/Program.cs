@@ -11,55 +11,70 @@ namespace HotkeyAutomation
 {
 	class Program
 	{
+		/// <summary>
+		/// Set = true to cause a restart!
+		/// </summary>
+		public static bool restartNow;
+
 		static void Main(string[] args)
 		{
-			Console.WriteLine("HotkeyAutomation Server " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
-			try
+			do
 			{
-				ServiceWrapper.Initialize();
-				ServiceWrapper.Start();
-				bool unix = Platform.IsUnix();
-				AllKeyboardListener unixKeyListener = null;
-				if (unix)
+				restartNow = false;
+				Console.WriteLine("HotkeyAutomation Server " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
+				try
 				{
-					unixKeyListener = new AllKeyboardListener(5000);
-					unixKeyListener.KeyDownEvent += UnixKeyListener_KeyDownEvent;
-				}
-				bool exit = false;
-				Console.CancelKeyPress += (sender, e) =>
-				{
-					exit = true;
-					e.Cancel = true;
-				};
-				while (true)
-				{
-					while (!Console.KeyAvailable && !exit)
-						Thread.Sleep(1);
-					if (exit)
+					ServiceWrapper.Initialize();
+					ServiceWrapper.Start();
+					bool unix = Platform.IsUnix();
+					AllKeyboardListener unixKeyListener = null;
+					if (unix)
 					{
-						Console.Write("Exiting");
-						break;
+						unixKeyListener = new AllKeyboardListener(5000);
+						unixKeyListener.KeyDownEvent += UnixKeyListener_KeyDownEvent;
 					}
-					ConsoleKeyInfo cki = Console.ReadKey(true);
-					if (cki.Modifiers == ConsoleModifiers.Control && (cki.Key == ConsoleKey.C || cki.Key == ConsoleKey.Pause))
+					bool exit = false;
+					Console.CancelKeyPress += (sender, e) =>
 					{
-						Console.Write("Exiting");
-						break;
+						exit = true;
+						e.Cancel = true;
+					};
+					while (true)
+					{
+						while (!Console.KeyAvailable && !exit && !restartNow)
+							Thread.Sleep(1);
+						if (restartNow)
+						{
+							Console.Write("Restarting application now! ");
+							break;
+						}
+						if (exit)
+						{
+							Console.Write("Exiting");
+							break;
+						}
+						ConsoleKeyInfo cki = Console.ReadKey(true);
+						if (cki.Modifiers == ConsoleModifiers.Control && (cki.Key == ConsoleKey.C || cki.Key == ConsoleKey.Pause))
+						{
+							Console.Write("Exiting");
+							break;
+						}
+						if (!unix)
+							ServiceWrapper.hotkeyManager.NotifyKeyPressed((int)cki.Key);
 					}
-					if (!unix)
-						ServiceWrapper.hotkeyManager.NotifyKeyPressed((int)cki.Key);
+				}
+				catch (ThreadAbortException) { }
+				catch (Exception ex)
+				{
+					Logger.Debug(ex);
+				}
+				finally
+				{
+					ServiceWrapper.Stop();
+					Console.WriteLine("...");
 				}
 			}
-			catch (ThreadAbortException) { }
-			catch (Exception ex)
-			{
-				Logger.Debug(ex);
-			}
-			finally
-			{
-				ServiceWrapper.Stop();
-				Console.WriteLine("...");
-			}
+			while (restartNow);
 		}
 
 		private static void UnixKeyListener_KeyDownEvent(object sender, LinuxInputEventArgs e)

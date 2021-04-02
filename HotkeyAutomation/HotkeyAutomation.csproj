@@ -34,6 +34,9 @@
     <LangVersion>default</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotNetZip, Version=1.15.0.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetZip.1.15.0\lib\net40\DotNetZip.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -70,6 +73,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceWrapper.cs" />
     <Compile Include="HotkeyConfig.cs" />
+    <Compile Include="WebServer\ConfigurationIO.cs" />
     <Compile Include="WebServer\JSONAPI.cs" />
     <Compile Include="WebServer\WebServer.cs" />
   </ItemGroup>
@@ -113,6 +117,7 @@
     <None Include="www\vues\itach\iTachList.vue" />
     <None Include="www\vues\broadlink\BroadLinkList.vue" />
     <None Include="www\vues\broadlink\BroadLinkListItem.vue" />
+    <None Include="www\vues\system\SystemConfiguration.vue" />
     <None Include="www\vues\vera\VeraListItem.vue" />
     <None Include="www\vues\vera\VeraList.vue" />
     <None Include="Z_NpmInstall.bat" />

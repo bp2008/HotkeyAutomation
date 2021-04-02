@@ -116,7 +116,7 @@ export function AppendArrays(a, b)
 	var i = 0;
 	for (; i < a.length; i++)
 		c[i] = a[i];
-	for (var j = 0; j < b.length; i++ , j++)
+	for (var j = 0; j < b.length; i++, j++)
 		c[i] = b[j];
 	return c;
 }
