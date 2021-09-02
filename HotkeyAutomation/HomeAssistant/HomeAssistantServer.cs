@@ -91,9 +91,9 @@ namespace HotkeyAutomation.HomeAssistant
 				if (brightness == 0)
 					service = "turn_off";
 				if (method == HomeAssistantMethod.DimmerValue)
-					serviceClient.CallService(domain, service, new { entity_id = EntityId, brightness });
+					serviceClient.CallService(domain, service, new { entity_id = EntityId, brightness }).Wait();
 				else if (method == HomeAssistantMethod.SwitchSet)
-					serviceClient.CallService(domain, service, new { entity_id = EntityId });
+					serviceClient.CallService(domain, service, new { entity_id = EntityId }).Wait();
 				else
 				{
 					Logger.Info("HomeAssistantServer rejects method " + method + " for entity " + EntityId);
@@ -112,7 +112,7 @@ namespace HotkeyAutomation.HomeAssistant
 				if (state == 0)
 					service = "turn_off";
 				if (method == HomeAssistantMethod.SwitchSet)
-					serviceClient.CallService(domain, service, new { entity_id = EntityId });
+					serviceClient.CallService(domain, service, new { entity_id = EntityId }).Wait();
 				else
 				{
 					Logger.Info("HomeAssistantServer rejects method " + method + " for entity " + EntityId);
