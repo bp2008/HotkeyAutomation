@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>HotkeyAutomation</RootNamespace>
     <AssemblyName>HotkeyAutomation</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
@@ -38,11 +38,8 @@
     <Reference Include="DotNetZip, Version=1.15.0.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
       <HintPath>..\packages\DotNetZip.1.15.0\lib\net40\DotNetZip.dll</HintPath>
     </Reference>
-    <Reference Include="HADotNet.Core, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\HADotNet.Core.1.6.0\lib\netstandard2.0\HADotNet.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -179,6 +176,10 @@
     <ProjectReference Include="..\..\broadlink-dotnet\Broadlink.Net.Framework\Broadlink.Net.Framework.csproj">
       <Project>{084b86e2-77f9-42c0-bf04-4d25b1f99179}</Project>
       <Name>Broadlink.Net.Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HADotNet.Core\HADotNet.Core.csproj">
+      <Project>{d7d36f6b-8d7e-4717-8788-3a78da71d96f}</Project>
+      <Name>HADotNet.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BPUtil", "..\BPUtil\BPUtil\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Broadlink.Net.Framework", "..\broadlink-dotnet\Broadlink.Net.Framework\Broadlink.Net.Framework.csproj", "{084B86E2-77F9-42C0-BF04-4D25B1F99179}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HADotNet.Core", "HADotNet.Core\HADotNet.Core.csproj", "{D7D36F6B-8D7E-4717-8788-3A78DA71D96F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{084B86E2-77F9-42C0-BF04-4D25B1F99179}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{084B86E2-77F9-42C0-BF04-4D25B1F99179}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{084B86E2-77F9-42C0-BF04-4D25B1F99179}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7D36F6B-8D7E-4717-8788-3A78DA71D96F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7D36F6B-8D7E-4717-8788-3A78DA71D96F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7D36F6B-8D7E-4717-8788-3A78DA71D96F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7D36F6B-8D7E-4717-8788-3A78DA71D96F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
