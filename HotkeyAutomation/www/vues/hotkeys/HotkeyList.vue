@@ -15,6 +15,8 @@
 			this.$store.dispatch("CacheApiResponse", "vera_command_list");
 			this.$store.dispatch("CacheApiResponse", "broadlink_command_short_names");
 			this.$store.dispatch("CacheApiResponse", "ir_command_short_names");
+			this.$store.dispatch("CacheApiResponse", "hass_names");
+			this.$store.dispatch("CacheApiResponse", "hass_entities");
 		}
 	};
 </script>

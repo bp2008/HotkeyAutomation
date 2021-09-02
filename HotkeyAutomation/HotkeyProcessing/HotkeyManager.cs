@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BPUtil;
 using HotkeyAutomation.BroadLinkRM;
+using HotkeyAutomation.HomeAssistant;
 using HotkeyAutomation.iTach;
 using HotkeyAutomation.Vera;
 using Newtonsoft.Json;
@@ -190,6 +191,17 @@ namespace HotkeyAutomation.HotkeyProcessing
 								break;
 							}
 							vera.Send(effect.data);
+							break;
+						}
+					case EffectType.HomeAssistant:
+						{
+							HomeAssistantServer hassServer = ServiceWrapper.config.homeAssistantServers.Get(effect.data.hass_servername);
+							if (hassServer == null)
+							{
+								Logger.Info("HomeAssistant Server \"" + effect.data.hass_servername + "\" does not exist.");
+								break;
+							}
+							hassServer.CallService(effect.data.hass_entityid, effect.data.hass_method.Value, effect.data.hass_value);
 							break;
 						}
 					default:

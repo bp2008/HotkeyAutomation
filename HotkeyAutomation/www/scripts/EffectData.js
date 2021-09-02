@@ -2,12 +2,17 @@
 	HttpGet: "HttpGet",
 	BroadLink: "BroadLink",
 	iTach: "iTach",
-	Vera: "Vera"
+	Vera: "Vera",
+	HomeAssistant: "HomeAssistant"
 };
 export var VeraService = {
 	DimmerValue: "DimmerValue",
 	SwitchSet: "SwitchSet",
 	CurtainStop: "CurtainStop"
+};
+export var HomeAssistantMethod = {
+	DimmerValue: "DimmerValue",
+	SwitchSet: "SwitchSet"
 };
 export class Effect
 {
@@ -33,5 +38,9 @@ export class EffectData
 		this.vera_deviceNum = 0;
 		this.vera_service = VeraService.DimmerValue;
 		this.vera_value = null;
+		this.hass_servername = null;
+		this.hass_entityid = null;
+		this.hass_method = null;
+		this.hass_value = null;
 	}
 }

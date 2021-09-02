@@ -5,6 +5,7 @@
 		HttpGet,
 		BroadLink,
 		iTach,
-		Vera
+		Vera,
+		HomeAssistant
 	}
 }

@@ -35,6 +35,15 @@
 				</label>
 				<label>Value: <input type="text" v-model="effect.data.vera_value" @change="edit" /></label>
 			</div>
+			<div v-else-if="effect.type === EffectType.HomeAssistant" key="homeassistant">
+				<label>HomeAssistant Server: <VSelect v-model="effect.data.hass_servername" :options="homeAssistantNameOptions" @change="edit" /></label>
+				<label>Device: <VSelect v-model="effect.data.hass_entityid" :options="homeAssistantEntities" @change="edit" /></label>
+				<label>
+					Method:
+					<VSelect v-model="effect.data.hass_method" :options="homeAssistantMethods" @change="edit" />
+				</label>
+				<label title="For SwitchSet, 0 or 1.  For DimmerValue, 0 to 255.">Value: <input type="text" v-model="effect.data.hass_value" @change="edit" /></label>
+			</div>
 			<div v-else key="unknownEffectType">
 				Unknown Effect Type: {{effect.type}}
 			</div>
@@ -45,7 +54,7 @@
 <script>
 	import svg1 from 'appRoot/images/sprite/remove.svg';
 	import VSelect from 'appRoot/vues/common/controls/VSelect.vue';
-	import { EffectType, VeraService } from 'appRoot/scripts/EffectData.js';
+	import { EffectType, VeraService, HomeAssistantMethod } from 'appRoot/scripts/EffectData.js';
 
 	export default {
 		components: { VSelect },
@@ -61,8 +70,10 @@
 			return {
 				EffectType: EffectType,
 				VeraService: VeraService,
-				effectTypes: this.SimpleItemList([EffectType.HttpGet, EffectType.BroadLink, EffectType.iTach, EffectType.Vera]),
+				HomeAssistantMethod: HomeAssistantMethod,
+				effectTypes: this.SimpleItemList([EffectType.HttpGet, EffectType.BroadLink, EffectType.iTach, EffectType.Vera, EffectType.HomeAssistant]),
 				veraServices: this.SimpleItemList([VeraService.DimmerValue, VeraService.SwitchSet, VeraService.CurtainStop]),
+				homeAssistantMethods: this.SimpleItemList([HomeAssistantMethod.DimmerValue, HomeAssistantMethod.SwitchSet]),
 				deleting: false
 			};
 		},
@@ -113,6 +124,26 @@
 					}
 				}
 				return options;
+			},
+			homeAssistantNameOptions()
+			{
+				let data = this.$store.getters.GetCachedResponse("hass_names");
+				return this.SimpleItemList(data);
+			},
+			homeAssistantEntities()
+			{
+				let entities = [{ Value: "", Text: "" }];
+				let data = this.$store.getters.GetCachedResponse("hass_entities");
+				if (data && this.effect && this.effect.data && this.effect.data.hass_servername)
+				{
+					for (let i = 0; i < data.length; i++)
+					{
+						let ent = data[i];
+						if (ent && ent.ServerName === this.effect.data.hass_servername)
+							entities.push({ Value: ent.EntityId, Text: ent.FriendlyName });
+					}
+				}
+				return entities;
 			}
 		},
 		methods:

@@ -8,10 +8,11 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>HotkeyAutomation</RootNamespace>
     <AssemblyName>HotkeyAutomation</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -37,8 +38,11 @@
     <Reference Include="DotNetZip, Version=1.15.0.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
       <HintPath>..\packages\DotNetZip.1.15.0\lib\net40\DotNetZip.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="HADotNet.Core, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\HADotNet.Core.1.6.0\lib\netstandard2.0\HADotNet.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -53,6 +57,7 @@
     <Compile Include="BroadLinkRM\BroadLinkCmd.cs" />
     <Compile Include="BroadLinkRM\BroadLinkController.cs" />
     <Compile Include="BroadLinkRM\BroadLinkCommands.cs" />
+    <Compile Include="HomeAssistant\HomeAssistantServer.cs" />
     <Compile Include="IRBlasters\Converter.cs" />
     <Compile Include="IRBlasters\IRCommands.cs" />
     <Compile Include="iTach\iTachCommands.cs" />
@@ -118,6 +123,8 @@
     <None Include="www\vues\broadlink\BroadLinkList.vue" />
     <None Include="www\vues\broadlink\BroadLinkListItem.vue" />
     <None Include="www\vues\system\SystemConfiguration.vue" />
+    <None Include="www\vues\homeassistant\HomeAssistantList.vue" />
+    <None Include="www\vues\homeassistant\HomeAssistantListItem.vue" />
     <None Include="www\vues\vera\VeraListItem.vue" />
     <None Include="www\vues\vera\VeraList.vue" />
     <None Include="Z_NpmInstall.bat" />

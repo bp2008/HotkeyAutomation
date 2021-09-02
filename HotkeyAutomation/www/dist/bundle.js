@@ -1150,6 +1150,7 @@ exports.default = {
 //
 //
 //
+//
 
 /***/ }),
 
@@ -1707,6 +1708,9 @@ exports.default = {
 		isBroadlinkController: function isBroadlinkController() {
 			return this.apiKey === "broadlink";
 		},
+		isHomeAssistantServer: function isHomeAssistantServer() {
+			return this.itemType === "HomeAssistant";
+		},
 		undoItems: function undoItems() {
 			var component = this;
 			while (component.$parent) {
@@ -1792,6 +1796,14 @@ exports.default = {
 	},
 	created: function created() {}
 }; //
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2557,6 +2569,106 @@ exports.default = {
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js?!./www/vues/homeassistant/HomeAssistantList.vue?vue&type=script&lang=js&":
+/*!*****************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/homeassistant/HomeAssistantList.vue?vue&type=script&lang=js& ***!
+  \*****************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _List = __webpack_require__(/*! appRoot/vues/common/List.vue */ "./www/vues/common/List.vue");
+
+var _List2 = _interopRequireDefault(_List);
+
+var _api = __webpack_require__(/*! appRoot/api/api.js */ "./www/api/api.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+exports.default = {
+	components: { List: _List2.default },
+	data: function data() {
+		return {
+			isLoadingEntityLists: false
+		};
+	},
+
+	methods: {
+		reloadEntityLists: function reloadEntityLists() {
+			var _this = this;
+
+			if (this.isLoadingEntityLists) return;
+			this.isLoadingEntityLists = true;
+			(0, _api.ExecJSON)({ cmd: "hass_load" }).then(function (data) {
+				toaster.success(data.data);
+			}).catch(function (err) {
+				toaster.error(err);
+			}).finally(function () {
+				_this.isLoadingEntityLists = false;
+			});
+		}
+	}
+};
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js?!./www/vues/homeassistant/HomeAssistantListItem.vue?vue&type=script&lang=js&":
+/*!*********************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/homeassistant/HomeAssistantListItem.vue?vue&type=script&lang=js& ***!
+  \*********************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _NamedListItem = __webpack_require__(/*! appRoot/vues/common/NamedListItem.vue */ "./www/vues/common/NamedListItem.vue");
+
+var _NamedListItem2 = _interopRequireDefault(_NamedListItem);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+	components: { NamedListItem: _NamedListItem2.default },
+	props: {
+		item: {
+			type: Object,
+			required: true
+		}
+	},
+	methods: {
+		resetState: function resetState() {
+			if (this.$refs.item.resetState) this.$refs.item.resetState();
+		}
+	}
+}; //
+//
+//
+//
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js?!./www/vues/hotkeys/HotkeyEffect.vue?vue&type=script&lang=js&":
 /*!******************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/hotkeys/HotkeyEffect.vue?vue&type=script&lang=js& ***!
@@ -2595,8 +2707,10 @@ exports.default = {
 		return {
 			EffectType: _EffectData.EffectType,
 			VeraService: _EffectData.VeraService,
-			effectTypes: this.SimpleItemList([_EffectData.EffectType.HttpGet, _EffectData.EffectType.BroadLink, _EffectData.EffectType.iTach, _EffectData.EffectType.Vera]),
+			HomeAssistantMethod: _EffectData.HomeAssistantMethod,
+			effectTypes: this.SimpleItemList([_EffectData.EffectType.HttpGet, _EffectData.EffectType.BroadLink, _EffectData.EffectType.iTach, _EffectData.EffectType.Vera, _EffectData.EffectType.HomeAssistant]),
 			veraServices: this.SimpleItemList([_EffectData.VeraService.DimmerValue, _EffectData.VeraService.SwitchSet, _EffectData.VeraService.CurtainStop]),
+			homeAssistantMethods: this.SimpleItemList([_EffectData.HomeAssistantMethod.DimmerValue, _EffectData.HomeAssistantMethod.SwitchSet]),
 			deleting: false
 		};
 	},
@@ -2637,6 +2751,21 @@ exports.default = {
 				}
 			}
 			return options;
+		},
+		homeAssistantNameOptions: function homeAssistantNameOptions() {
+			var data = this.$store.getters.GetCachedResponse("hass_names");
+			return this.SimpleItemList(data);
+		},
+		homeAssistantEntities: function homeAssistantEntities() {
+			var entities = [{ Value: "", Text: "" }];
+			var data = this.$store.getters.GetCachedResponse("hass_entities");
+			if (data && this.effect && this.effect.data && this.effect.data.hass_servername) {
+				for (var i = 0; i < data.length; i++) {
+					var ent = data[i];
+					if (ent && ent.ServerName === this.effect.data.hass_servername) entities.push({ Value: ent.EntityId, Text: ent.FriendlyName });
+				}
+			}
+			return entities;
 		}
 	},
 	methods: {
@@ -2716,6 +2845,15 @@ exports.default = {
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /***/ }),
 
@@ -2748,6 +2886,8 @@ exports.default = {
 		this.$store.dispatch("CacheApiResponse", "vera_command_list");
 		this.$store.dispatch("CacheApiResponse", "broadlink_command_short_names");
 		this.$store.dispatch("CacheApiResponse", "ir_command_short_names");
+		this.$store.dispatch("CacheApiResponse", "hass_names");
+		this.$store.dispatch("CacheApiResponse", "hass_entities");
 	}
 }; //
 //
@@ -29414,6 +29554,25 @@ exports.push([module.i, "\n.undoStack[data-v-a3d2317e]\n{\n\tposition: fixed;\n\
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js?!./www/vues/homeassistant/HomeAssistantList.vue?vue&type=style&index=0&id=1e628bd1&scoped=true&lang=css&":
+/*!****************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/homeassistant/HomeAssistantList.vue?vue&type=style&index=0&id=1e628bd1&scoped=true&lang=css& ***!
+  \****************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.buttons[data-v-1e628bd1]\n{\n\tmargin: 10px;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js?!./www/vues/hotkeys/HotkeyEffect.vue?vue&type=style&index=0&id=73f7e95d&scoped=true&lang=css&":
 /*!*****************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/hotkeys/HotkeyEffect.vue?vue&type=style&index=0&id=73f7e95d&scoped=true&lang=css& ***!
@@ -37007,6 +37166,36 @@ if(false) {}
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js?!./www/vues/homeassistant/HomeAssistantList.vue?vue&type=style&index=0&id=1e628bd1&scoped=true&lang=css&":
+/*!********************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader!./node_modules/css-loader!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/homeassistant/HomeAssistantList.vue?vue&type=style&index=0&id=1e628bd1&scoped=true&lang=css& ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../../node_modules/css-loader!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/vue-loader/lib??vue-loader-options!./HomeAssistantList.vue?vue&type=style&index=0&id=1e628bd1&scoped=true&lang=css& */ "./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js?!./www/vues/homeassistant/HomeAssistantList.vue?vue&type=style&index=0&id=1e628bd1&scoped=true&lang=css&");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js?!./www/vues/hotkeys/HotkeyEffect.vue?vue&type=style&index=0&id=73f7e95d&scoped=true&lang=css&":
 /*!*********************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/style-loader!./node_modules/css-loader!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/hotkeys/HotkeyEffect.vue?vue&type=style&index=0&id=73f7e95d&scoped=true&lang=css& ***!
@@ -39131,6 +39320,10 @@ var render = function() {
                 _vm._v("BroadLink Controllers")
               ]),
               _vm._v(" "),
+              _c("b-nav-item", { attrs: { to: { name: "homeassistants" } } }, [
+                _vm._v("Home Assistant Servers")
+              ]),
+              _vm._v(" "),
               _c("b-nav-item", { attrs: { to: { name: "system" } } }, [
                 _vm._v("System")
               ])
@@ -39513,7 +39706,7 @@ var render = function() {
             }
           }),
           _vm._v(" "),
-          !_vm.isHotkey && !_vm.isBroadlinkCmd
+          !_vm.isHotkey && !_vm.isBroadlinkCmd && !_vm.isHomeAssistantServer
             ? _c("label", [
                 _vm._v("\n\t\t\tHost:\n\t\t\t"),
                 _c("input", {
@@ -39541,7 +39734,10 @@ var render = function() {
               ])
             : _vm._e(),
           _vm._v(" "),
-          !_vm.isHotkey && !_vm.isBroadlinkCmd && _vm.includePort
+          !_vm.isHotkey &&
+          !_vm.isBroadlinkCmd &&
+          !_vm.isHomeAssistantServer &&
+          _vm.includePort
             ? _c("label", [
                 _vm._v("\n\t\t\tPort:\n\t\t\t"),
                 _c("input", {
@@ -39572,6 +39768,65 @@ var render = function() {
                     },
                     blur: function($event) {
                       _vm.$forceUpdate()
+                    }
+                  }
+                })
+              ])
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.isHomeAssistantServer
+            ? _c("label", [
+                _vm._v("\n\t\t\tURL:\n\t\t\t"),
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.item.url,
+                      expression: "item.url"
+                    }
+                  ],
+                  staticClass: "url",
+                  attrs: {
+                    type: "text",
+                    placeholder: "http://homeassistant:8123/"
+                  },
+                  domProps: { value: _vm.item.url },
+                  on: {
+                    change: _vm.edit,
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(_vm.item, "url", $event.target.value)
+                    }
+                  }
+                })
+              ])
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.isHomeAssistantServer
+            ? _c("label", [
+                _vm._v("\n\t\t\tAPI KEY:\n\t\t\t"),
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.item.apiKey,
+                      expression: "item.apiKey"
+                    }
+                  ],
+                  staticClass: "apiKey",
+                  attrs: { type: "text", placeholder: "01234567890abcdef" },
+                  domProps: { value: _vm.item.apiKey },
+                  on: {
+                    change: _vm.edit,
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(_vm.item, "apiKey", $event.target.value)
                     }
                   }
                 })
@@ -40216,6 +40471,94 @@ render._withStripped = true
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./www/vues/homeassistant/HomeAssistantList.vue?vue&type=template&id=1e628bd1&scoped=true&":
+/*!*******************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/homeassistant/HomeAssistantList.vue?vue&type=template&id=1e628bd1&scoped=true& ***!
+  \*******************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    [
+      _c("List", {
+        attrs: {
+          componentName: "HomeAssistantListItem",
+          itemType: "HomeAssistant",
+          apiKey: "hass"
+        }
+      }),
+      _vm._v(" "),
+      _c("div", { staticClass: "buttons" }, [
+        _c("div", [
+          _vm._v(
+            "Reload the command lists after you are done adding or editing HomeAssistant server information."
+          )
+        ]),
+        _vm._v(" "),
+        _c("input", {
+          attrs: { type: "button", value: "Reload Entity Lists" },
+          on: { click: _vm.reloadEntityLists }
+        })
+      ])
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./www/vues/homeassistant/HomeAssistantListItem.vue?vue&type=template&id=3fd36504&":
+/*!***********************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/homeassistant/HomeAssistantListItem.vue?vue&type=template&id=3fd36504& ***!
+  \***********************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "NamedListItem",
+    _vm._g(
+      {
+        ref: "item",
+        attrs: {
+          item: _vm.item,
+          apiKey: "hass",
+          itemType: "HomeAssistant",
+          includePort: true,
+          portPlaceholder: "80"
+        }
+      },
+      _vm.$listeners
+    )
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./www/vues/hotkeys/HotkeyEffect.vue?vue&type=template&id=73f7e95d&scoped=true&":
 /*!********************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./www/vues/hotkeys/HotkeyEffect.vue?vue&type=template&id=73f7e95d&scoped=true& ***!
@@ -40581,13 +40924,118 @@ var render = function() {
                         })
                       ])
                     ])
-                  : _c("div", { key: "unknownEffectType" }, [
-                      _vm._v(
-                        "\n\t\t\tUnknown Effect Type: " +
-                          _vm._s(_vm.effect.type) +
-                          "\n\t\t"
-                      )
-                    ])
+                  : _vm.effect.type === _vm.EffectType.HomeAssistant
+                    ? _c("div", { key: "homeassistant" }, [
+                        _c(
+                          "label",
+                          [
+                            _vm._v("HomeAssistant Server: "),
+                            _c("VSelect", {
+                              attrs: { options: _vm.homeAssistantNameOptions },
+                              on: { change: _vm.edit },
+                              model: {
+                                value: _vm.effect.data.hass_servername,
+                                callback: function($$v) {
+                                  _vm.$set(
+                                    _vm.effect.data,
+                                    "hass_servername",
+                                    $$v
+                                  )
+                                },
+                                expression: "effect.data.hass_servername"
+                              }
+                            })
+                          ],
+                          1
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "label",
+                          [
+                            _vm._v("Device: "),
+                            _c("VSelect", {
+                              attrs: { options: _vm.homeAssistantEntities },
+                              on: { change: _vm.edit },
+                              model: {
+                                value: _vm.effect.data.hass_entityid,
+                                callback: function($$v) {
+                                  _vm.$set(
+                                    _vm.effect.data,
+                                    "hass_entityid",
+                                    $$v
+                                  )
+                                },
+                                expression: "effect.data.hass_entityid"
+                              }
+                            })
+                          ],
+                          1
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "label",
+                          [
+                            _vm._v("\n\t\t\t\tMethod:\n\t\t\t\t"),
+                            _c("VSelect", {
+                              attrs: { options: _vm.homeAssistantMethods },
+                              on: { change: _vm.edit },
+                              model: {
+                                value: _vm.effect.data.hass_method,
+                                callback: function($$v) {
+                                  _vm.$set(_vm.effect.data, "hass_method", $$v)
+                                },
+                                expression: "effect.data.hass_method"
+                              }
+                            })
+                          ],
+                          1
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "label",
+                          {
+                            attrs: {
+                              title:
+                                "For SwitchSet, 0 or 1.  For DimmerValue, 0 to 255."
+                            }
+                          },
+                          [
+                            _vm._v("Value: "),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.effect.data.hass_value,
+                                  expression: "effect.data.hass_value"
+                                }
+                              ],
+                              attrs: { type: "text" },
+                              domProps: { value: _vm.effect.data.hass_value },
+                              on: {
+                                change: _vm.edit,
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.$set(
+                                    _vm.effect.data,
+                                    "hass_value",
+                                    $event.target.value
+                                  )
+                                }
+                              }
+                            })
+                          ]
+                        )
+                      ])
+                    : _c("div", { key: "unknownEffectType" }, [
+                        _vm._v(
+                          "\n\t\t\tUnknown Effect Type: " +
+                            _vm._s(_vm.effect.type) +
+                            "\n\t\t"
+                        )
+                      ])
         ])
       : _vm._e()
   ])
@@ -53333,6 +53781,10 @@ var _BroadLinkCommandItem = __webpack_require__(/*! appRoot/vues/broadlink/Broad
 
 var _BroadLinkCommandItem2 = _interopRequireDefault(_BroadLinkCommandItem);
 
+var _HomeAssistantListItem = __webpack_require__(/*! appRoot/vues/homeassistant/HomeAssistantListItem.vue */ "./www/vues/homeassistant/HomeAssistantListItem.vue");
+
+var _HomeAssistantListItem2 = _interopRequireDefault(_HomeAssistantListItem);
+
 var _ToasterHelper = __webpack_require__(/*! appRoot/scripts/ToasterHelper.js */ "./www/scripts/ToasterHelper.js");
 
 var _ToasterHelper2 = _interopRequireDefault(_ToasterHelper);
@@ -53360,6 +53812,7 @@ _vue2.default.component('iTachListItem', _iTachListItem2.default);
 _vue2.default.component('VeraListItem', _VeraListItem2.default);
 _vue2.default.component('BroadLinkListItem', _BroadLinkListItem2.default);
 _vue2.default.component('BroadLinkCommandItem', _BroadLinkCommandItem2.default);
+_vue2.default.component('HomeAssistantListItem', _HomeAssistantListItem2.default);
 
 // Any recursively nested components must be globally registered here
 //Vue.component('Example', require('Example.vue').default);
@@ -53445,6 +53898,10 @@ var _BroadLinkCommandList = __webpack_require__(/*! appRoot/vues/broadlink/Broad
 
 var _BroadLinkCommandList2 = _interopRequireDefault(_BroadLinkCommandList);
 
+var _HomeAssistantList = __webpack_require__(/*! appRoot/vues/homeassistant/HomeAssistantList.vue */ "./www/vues/homeassistant/HomeAssistantList.vue");
+
+var _HomeAssistantList2 = _interopRequireDefault(_HomeAssistantList);
+
 var _SystemConfiguration = __webpack_require__(/*! appRoot/vues/system/SystemConfiguration.vue */ "./www/vues/system/SystemConfiguration.vue");
 
 var _SystemConfiguration2 = _interopRequireDefault(_SystemConfiguration);
@@ -53470,6 +53927,9 @@ function CreateRouter(store, basePath) {
 			}, {
 				path: 'vera', component: _PassThroughChild2.default,
 				children: [{ path: '', component: _VeraList2.default, name: 'veras' }]
+			}, {
+				path: 'homeassistant', component: _PassThroughChild2.default,
+				children: [{ path: '', component: _HomeAssistantList2.default, name: 'homeassistants' }]
 			}, {
 				path: 'broadlink', component: _PassThroughChild2.default,
 				children: [{ path: '', component: _BroadLinkList2.default, name: 'broadlinks' }]
@@ -53626,12 +54086,17 @@ var EffectType = exports.EffectType = {
 	HttpGet: "HttpGet",
 	BroadLink: "BroadLink",
 	iTach: "iTach",
-	Vera: "Vera"
+	Vera: "Vera",
+	HomeAssistant: "HomeAssistant"
 };
 var VeraService = exports.VeraService = {
 	DimmerValue: "DimmerValue",
 	SwitchSet: "SwitchSet",
 	CurtainStop: "CurtainStop"
+};
+var HomeAssistantMethod = exports.HomeAssistantMethod = {
+	DimmerValue: "DimmerValue",
+	SwitchSet: "SwitchSet"
 };
 
 var Effect = exports.Effect = function Effect() {
@@ -53656,6 +54121,10 @@ var EffectData = exports.EffectData = function EffectData() {
 	this.vera_deviceNum = 0;
 	this.vera_service = VeraService.DimmerValue;
 	this.vera_value = null;
+	this.hass_servername = null;
+	this.hass_entityid = null;
+	this.hass_method = null;
+	this.hass_value = null;
 };
 
 /***/ }),
@@ -55848,6 +56317,168 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_UndoStack_vue_vue_type_template_id_a3d2317e_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_UndoStack_vue_vue_type_template_id_a3d2317e_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./www/vues/homeassistant/HomeAssistantList.vue":
+/*!******************************************************!*\
+  !*** ./www/vues/homeassistant/HomeAssistantList.vue ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _HomeAssistantList_vue_vue_type_template_id_1e628bd1_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./HomeAssistantList.vue?vue&type=template&id=1e628bd1&scoped=true& */ "./www/vues/homeassistant/HomeAssistantList.vue?vue&type=template&id=1e628bd1&scoped=true&");
+/* harmony import */ var _HomeAssistantList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./HomeAssistantList.vue?vue&type=script&lang=js& */ "./www/vues/homeassistant/HomeAssistantList.vue?vue&type=script&lang=js&");
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _HomeAssistantList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _HomeAssistantList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+/* harmony import */ var _HomeAssistantList_vue_vue_type_style_index_0_id_1e628bd1_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./HomeAssistantList.vue?vue&type=style&index=0&id=1e628bd1&scoped=true&lang=css& */ "./www/vues/homeassistant/HomeAssistantList.vue?vue&type=style&index=0&id=1e628bd1&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+  _HomeAssistantList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _HomeAssistantList_vue_vue_type_template_id_1e628bd1_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _HomeAssistantList_vue_vue_type_template_id_1e628bd1_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "1e628bd1",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "www/vues/homeassistant/HomeAssistantList.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./www/vues/homeassistant/HomeAssistantList.vue?vue&type=script&lang=js&":
+/*!*******************************************************************************!*\
+  !*** ./www/vues/homeassistant/HomeAssistantList.vue?vue&type=script&lang=js& ***!
+  \*******************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib!../../../node_modules/vue-loader/lib??vue-loader-options!./HomeAssistantList.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js?!./www/vues/homeassistant/HomeAssistantList.vue?vue&type=script&lang=js&");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0___default.a); 
+
+/***/ }),
+
+/***/ "./www/vues/homeassistant/HomeAssistantList.vue?vue&type=style&index=0&id=1e628bd1&scoped=true&lang=css&":
+/*!***************************************************************************************************************!*\
+  !*** ./www/vues/homeassistant/HomeAssistantList.vue?vue&type=style&index=0&id=1e628bd1&scoped=true&lang=css& ***!
+  \***************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantList_vue_vue_type_style_index_0_id_1e628bd1_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader!../../../node_modules/css-loader!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/vue-loader/lib??vue-loader-options!./HomeAssistantList.vue?vue&type=style&index=0&id=1e628bd1&scoped=true&lang=css& */ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js?!./www/vues/homeassistant/HomeAssistantList.vue?vue&type=style&index=0&id=1e628bd1&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantList_vue_vue_type_style_index_0_id_1e628bd1_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantList_vue_vue_type_style_index_0_id_1e628bd1_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantList_vue_vue_type_style_index_0_id_1e628bd1_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantList_vue_vue_type_style_index_0_id_1e628bd1_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantList_vue_vue_type_style_index_0_id_1e628bd1_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default.a); 
+
+/***/ }),
+
+/***/ "./www/vues/homeassistant/HomeAssistantList.vue?vue&type=template&id=1e628bd1&scoped=true&":
+/*!*************************************************************************************************!*\
+  !*** ./www/vues/homeassistant/HomeAssistantList.vue?vue&type=template&id=1e628bd1&scoped=true& ***!
+  \*************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantList_vue_vue_type_template_id_1e628bd1_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./HomeAssistantList.vue?vue&type=template&id=1e628bd1&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./www/vues/homeassistant/HomeAssistantList.vue?vue&type=template&id=1e628bd1&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantList_vue_vue_type_template_id_1e628bd1_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantList_vue_vue_type_template_id_1e628bd1_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./www/vues/homeassistant/HomeAssistantListItem.vue":
+/*!**********************************************************!*\
+  !*** ./www/vues/homeassistant/HomeAssistantListItem.vue ***!
+  \**********************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _HomeAssistantListItem_vue_vue_type_template_id_3fd36504___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./HomeAssistantListItem.vue?vue&type=template&id=3fd36504& */ "./www/vues/homeassistant/HomeAssistantListItem.vue?vue&type=template&id=3fd36504&");
+/* harmony import */ var _HomeAssistantListItem_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./HomeAssistantListItem.vue?vue&type=script&lang=js& */ "./www/vues/homeassistant/HomeAssistantListItem.vue?vue&type=script&lang=js&");
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _HomeAssistantListItem_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _HomeAssistantListItem_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _HomeAssistantListItem_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _HomeAssistantListItem_vue_vue_type_template_id_3fd36504___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _HomeAssistantListItem_vue_vue_type_template_id_3fd36504___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "www/vues/homeassistant/HomeAssistantListItem.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./www/vues/homeassistant/HomeAssistantListItem.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************!*\
+  !*** ./www/vues/homeassistant/HomeAssistantListItem.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantListItem_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib!../../../node_modules/vue-loader/lib??vue-loader-options!./HomeAssistantListItem.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js?!./www/vues/homeassistant/HomeAssistantListItem.vue?vue&type=script&lang=js&");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantListItem_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantListItem_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantListItem_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantListItem_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantListItem_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0___default.a); 
+
+/***/ }),
+
+/***/ "./www/vues/homeassistant/HomeAssistantListItem.vue?vue&type=template&id=3fd36504&":
+/*!*****************************************************************************************!*\
+  !*** ./www/vues/homeassistant/HomeAssistantListItem.vue?vue&type=template&id=3fd36504& ***!
+  \*****************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantListItem_vue_vue_type_template_id_3fd36504___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./HomeAssistantListItem.vue?vue&type=template&id=3fd36504& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./www/vues/homeassistant/HomeAssistantListItem.vue?vue&type=template&id=3fd36504&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantListItem_vue_vue_type_template_id_3fd36504___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeAssistantListItem_vue_vue_type_template_id_3fd36504___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

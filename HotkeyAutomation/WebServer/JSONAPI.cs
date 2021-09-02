@@ -293,6 +293,44 @@ namespace HotkeyAutomation
 							break;
 						}
 					#endregion
+					#region HomeAssistant
+					case "hass_reorder":
+					case "hass_names":
+					case "hass_list":
+					case "hass_new":
+					case "hass_get":
+					case "hass_update":
+					case "hass_delete":
+						{
+							response = NamedItemAPI(requestObj, ServiceWrapper.config.homeAssistantServers);
+							break;
+						}
+					case "hass_entities":
+						{
+							List<object> list = new List<object>();
+							Parallel.ForEach(ServiceWrapper.config.homeAssistantServers.List(), hass =>
+							{
+								List<object> listFromOneServer = hass.GetCommandList();
+								list.AddRange(listFromOneServer);
+							});
+							response = new ResultWithData(list);
+							break;
+						}
+					case "hass_load":
+						{
+							int success = 0;
+							int failure = 0;
+							Parallel.ForEach(ServiceWrapper.config.homeAssistantServers.List(), hass =>
+							{
+								if (hass.Load())
+									Interlocked.Increment(ref success);
+								else
+									Interlocked.Increment(ref failure);
+							});
+							response = new ResultWithData("HomeAssistant Entity Loading complete. Successful loads: " + success + ". Failed loads: " + failure);
+							break;
+						}
+					#endregion
 					default:
 						response = new ResultFail() { error = "command \"" + cmd + "\" not supported" };
 						break;

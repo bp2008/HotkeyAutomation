@@ -2,13 +2,21 @@
 	<div :class="{ itemRoot: true, deleting: deleting, working: working, isHotkey: isHotkey }">
 		<div class="topRow">
 			<input class="name" type="text" v-model="item.name" :placeholder="('Name this ' + itemType + '…')" @change="edit" />
-			<label v-if="!isHotkey && !isBroadlinkCmd">
+			<label v-if="!isHotkey && !isBroadlinkCmd && !isHomeAssistantServer">
 				Host:
 				<input class="host" type="text" v-model="item.host" placeholder="192.168.x.x" @change="edit" />
 			</label>
-			<label v-if="!isHotkey && !isBroadlinkCmd && includePort">
+			<label v-if="!isHotkey && !isBroadlinkCmd && !isHomeAssistantServer && includePort">
 				Port:
 				<input class="port" type="number" v-model.number="item.port" min="1" max="65535" :placeholder="portPlaceholder" @change="edit" />
+			</label>
+			<label v-if="isHomeAssistantServer">
+				URL:
+				<input class="url" type="text" v-model="item.url" placeholder="http://homeassistant:8123/" @change="edit" />
+			</label>
+			<label v-if="isHomeAssistantServer">
+				API KEY:
+				<input class="apiKey" type="text" v-model="item.apiKey" placeholder="01234567890abcdef" @change="edit" />
 			</label>
 			<span v-if="isHotkey" title="Bind new key"><svg @click="hotkeyListen"><use xlink:href="#input"></use></svg></span>
 			<span v-if="isHotkey" class="keyReadout">{{item.keyName}}</span>
@@ -96,6 +104,10 @@
 			isBroadlinkController()
 			{
 				return this.apiKey === "broadlink";
+			},
+			isHomeAssistantServer()
+			{
+				return this.itemType === "HomeAssistant";
 			},
 			undoItems()
 			{

@@ -9,6 +9,7 @@ import iTachList from 'appRoot/vues/itach/iTachList.vue';
 import VeraList from 'appRoot/vues/vera/VeraList.vue';
 import BroadLinkList from 'appRoot/vues/broadlink/BroadLinkList.vue';
 import BroadLinkCommandList from 'appRoot/vues/broadlink/BroadLinkCommandList.vue';
+import HomeAssistantList from 'appRoot/vues/homeassistant/HomeAssistantList.vue';
 import SystemConfiguration from 'appRoot/vues/system/SystemConfiguration.vue';
 
 Vue.use(VueRouter);
@@ -45,6 +46,12 @@ export default function CreateRouter(store, basePath)
 						path: 'vera', component: PassThroughChild,
 						children: [
 							{ path: '', component: VeraList, name: 'veras' }
+						]
+					},
+					{
+						path: 'homeassistant', component: PassThroughChild,
+						children: [
+							{ path: '', component: HomeAssistantList, name: 'homeassistants' }
 						]
 					},
 					{

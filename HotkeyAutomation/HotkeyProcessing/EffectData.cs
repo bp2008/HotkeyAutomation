@@ -29,11 +29,23 @@ namespace HotkeyAutomation.HotkeyProcessing
 		public VeraService? vera_service;
 		public string vera_value;
 		#endregion
+		#region HomeAssistant
+		public string hass_servername;
+		public string hass_entityid;
+		[JsonConverter(typeof(StringEnumConverter))]
+		public HomeAssistantMethod? hass_method;
+		public string hass_value;
+		#endregion
 	}
 	public enum VeraService
 	{
 		DimmerValue,
 		SwitchSet,
 		CurtainStop
+	}
+	public enum HomeAssistantMethod
+	{
+		DimmerValue,
+		SwitchSet
 	}
 }

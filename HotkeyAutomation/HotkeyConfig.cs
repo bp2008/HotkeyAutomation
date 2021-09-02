@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BPUtil;
 using HotkeyAutomation.BroadLinkRM;
+using HotkeyAutomation.HomeAssistant;
 using HotkeyAutomation.HotkeyProcessing;
 using HotkeyAutomation.iTach;
 using HotkeyAutomation.Vera;
@@ -30,6 +31,7 @@ namespace HotkeyAutomation
 		public NamedItemCollection<VeraController> veras = new NamedItemCollection<VeraController>();
 		public NamedItemCollection<iTachController> iTachs = new NamedItemCollection<iTachController>();
 		public NamedItemCollection<BroadLinkController> broadLinks = new NamedItemCollection<BroadLinkController>();
+		public NamedItemCollection<HomeAssistantServer> homeAssistantServers = new NamedItemCollection<HomeAssistantServer>();
 
 		#region Hotkeys
 
