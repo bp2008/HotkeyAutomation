@@ -132,12 +132,12 @@ namespace HotkeyAutomation.HomeAssistant
 			List<object> cmds = new List<object>();
 			foreach (StateObject state in states)
 			{
-				object friendlyName;
+				string friendlyName;
 				if (state.Attributes.TryGetValue("friendly_name", out object objFriendlyName))
 					friendlyName = objFriendlyName.ToString();
 				else
 					friendlyName = state.EntityId;
-				cmds.Add(new { ServerId = id, ServerName = name, EntityId = state.EntityId, FriendlyName = friendlyName.ToString() });
+				cmds.Add(new { ServerId = id, ServerName = name, EntityId = state.EntityId, FriendlyName = friendlyName });
 			}
 			return cmds;
 		}
