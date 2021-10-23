@@ -26,7 +26,7 @@ namespace HotkeyAutomation
 			Directory.SetCurrentDirectory(Globals.ApplicationDirectoryBase);
 			Logger.logType = LoggingMode.Console | LoggingMode.File;
 
-			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+			Logger.CatchAll();
 
 			BPUtil.SimpleHttp.SimpleHttpLogger.RegisterLogger(Logger.httpLogger);
 
@@ -59,6 +59,17 @@ namespace HotkeyAutomation
 				thr.IsBackground = true;
 				thr.Start();
 			}
+			
+			foreach (HomeAssistant.HomeAssistantServer hass in config.homeAssistantServers.List())
+			{
+				Thread thr = new Thread(() =>
+				{
+					hass.Load();
+				});
+				thr.Name = "HomeAssistant Data Load";
+				thr.IsBackground = true;
+				thr.Start();
+			}
 
 			httpServer = new WebServer(config.httpPort);
 			httpServer.SocketBound += HttpServer_SocketBound;
@@ -70,20 +81,6 @@ namespace HotkeyAutomation
 			httpServer.SocketBound -= HttpServer_SocketBound;
 		}
 
-		private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-		{
-			HandleUnhandledException((Exception)e.ExceptionObject, "Unhandled Exception");
-		}
-
-		private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
-		{
-			HandleUnhandledException(e.Exception, "Unhandled Thread Exception");
-		}
-
-		private static void HandleUnhandledException(Exception exception, string message)
-		{
-			Logger.Debug(exception, message);
-		}
 		public static void Start()
 		{
 			Logger.StartLoggingThreads();
