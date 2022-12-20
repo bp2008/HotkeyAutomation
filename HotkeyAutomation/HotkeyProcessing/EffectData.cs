@@ -46,6 +46,8 @@ namespace HotkeyAutomation.HotkeyProcessing
 	public enum HomeAssistantMethod
 	{
 		DimmerValue,
-		SwitchSet
+		SwitchSet,
+		CoverStop,
+		CoverSet
 	}
 }

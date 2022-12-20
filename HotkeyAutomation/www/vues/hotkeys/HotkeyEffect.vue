@@ -42,7 +42,11 @@
 					Method:
 					<VSelect v-model="effect.data.hass_method" :options="homeAssistantMethods" @change="edit" />
 				</label>
-				<label title="For SwitchSet, 0 or 1.  For DimmerValue, 0 to 255.">Value: <input type="text" v-model="effect.data.hass_value" @change="edit" /></label>
+				<label v-if="homeAssistantEffectRange">
+					Value: <input type="number" v-model="effect.data.hass_value" @change="edit"
+							 :min="homeAssistantEffectRange[0]"
+							 :max="homeAssistantEffectRange[1]" /><span> {{homeAssistantEffectRangeStr}}</span>
+				</label>
 			</div>
 			<div v-else key="unknownEffectType">
 				Unknown Effect Type: {{effect.type}}
@@ -73,7 +77,6 @@
 				HomeAssistantMethod: HomeAssistantMethod,
 				effectTypes: this.SimpleItemList([EffectType.HttpGet, EffectType.BroadLink, EffectType.iTach, EffectType.Vera, EffectType.HomeAssistant]),
 				veraServices: this.SimpleItemList([VeraService.DimmerValue, VeraService.SwitchSet, VeraService.CurtainStop]),
-				homeAssistantMethods: this.SimpleItemList([HomeAssistantMethod.DimmerValue, HomeAssistantMethod.SwitchSet]),
 				deleting: false
 			};
 		},
@@ -140,10 +143,48 @@
 					{
 						let ent = data[i];
 						if (ent && ent.ServerName === this.effect.data.hass_servername)
-							entities.push({ Value: ent.EntityId, Text: ent.FriendlyName });
+						{
+							let text = ent.FriendlyName + (ent.EntityId === ent.FriendlyName ? "" : (" (" + ent.EntityId + ")"));
+							entities.push({ Value: ent.EntityId, Text: text });
+						}
 					}
 				}
 				return entities;
+			},
+			homeAssistantEffectRange()
+			{
+				let m = this.effect.data.hass_method;
+				if (m)
+				{
+					if (m === HomeAssistantMethod.SwitchSet)
+						return [0, 1];
+					if (m === HomeAssistantMethod.DimmerValue)
+						return [0, 255];
+					if (m === HomeAssistantMethod.CoverSet)
+						return [0, 100];
+				}
+				return null;
+			},
+			homeAssistantEffectRangeStr()
+			{
+				let r = this.homeAssistantEffectRange;
+				if (r)
+					return r[0] + " to " + r[1];
+				return "";
+			},
+			homeAssistantMethods()
+			{
+				let e = this.effect.data.hass_entityid;
+				if (e)
+				{
+					if (e.toLowerCase().indexOf("switch.") > -1)
+						return this.SimpleItemList([HomeAssistantMethod.SwitchSet]);
+					if (e.toLowerCase().indexOf("light.") > -1)
+						return this.SimpleItemList([HomeAssistantMethod.DimmerValue, HomeAssistantMethod.SwitchSet]);
+					if (e.toLowerCase().indexOf("cover.") > -1)
+						return this.SimpleItemList([HomeAssistantMethod.CoverSet, HomeAssistantMethod.CoverStop]);
+				}
+				return this.SimpleItemList(["Unknown"]);
 			}
 		},
 		methods:
@@ -177,6 +218,13 @@
 				for (let i = 0; data && i < data.length; i++)
 					options.push({ Value: data[i], Text: data[i] });
 				return options;
+			},
+			validateHomeAssistantMethod()
+			{
+				for (let i = 0; i < this.homeAssistantMethods.length; i++)
+					if (this.homeAssistantMethods[i].Value === this.effect.data.hass_method)
+						return;
+				this.effect.data.hass_method = this.homeAssistantMethods[0].Value;
 			}
 		},
 		created()
@@ -186,12 +234,26 @@
 				this.effect.type = EffectType.HttpGet;
 				this.effect.data = {};
 			}
+			this.validateHomeAssistantMethod();
 		},
 		mounted()
 		{
 		},
 		beforeDestroy()
 		{
+		},
+		watch:
+		{
+			effect: {
+				deep: true,
+				handler()
+				{
+					this.$nextTick(() =>
+					{
+						this.validateHomeAssistantMethod();
+					});
+				}
+			}
 		}
 	};
 </script>

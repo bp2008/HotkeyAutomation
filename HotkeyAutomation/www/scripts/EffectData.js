@@ -12,7 +12,9 @@ export var VeraService = {
 };
 export var HomeAssistantMethod = {
 	DimmerValue: "DimmerValue",
-	SwitchSet: "SwitchSet"
+	SwitchSet: "SwitchSet",
+	CoverStop: "CoverStop",
+	CoverSet: "CoverSet"
 };
 export class Effect
 {

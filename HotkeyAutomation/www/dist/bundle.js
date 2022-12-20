@@ -2710,7 +2710,6 @@ exports.default = {
 			HomeAssistantMethod: _EffectData.HomeAssistantMethod,
 			effectTypes: this.SimpleItemList([_EffectData.EffectType.HttpGet, _EffectData.EffectType.BroadLink, _EffectData.EffectType.iTach, _EffectData.EffectType.Vera, _EffectData.EffectType.HomeAssistant]),
 			veraServices: this.SimpleItemList([_EffectData.VeraService.DimmerValue, _EffectData.VeraService.SwitchSet, _EffectData.VeraService.CurtainStop]),
-			homeAssistantMethods: this.SimpleItemList([_EffectData.HomeAssistantMethod.DimmerValue, _EffectData.HomeAssistantMethod.SwitchSet]),
 			deleting: false
 		};
 	},
@@ -2762,10 +2761,36 @@ exports.default = {
 			if (data && this.effect && this.effect.data && this.effect.data.hass_servername) {
 				for (var i = 0; i < data.length; i++) {
 					var ent = data[i];
-					if (ent && ent.ServerName === this.effect.data.hass_servername) entities.push({ Value: ent.EntityId, Text: ent.FriendlyName });
+					if (ent && ent.ServerName === this.effect.data.hass_servername) {
+						var text = ent.FriendlyName + (ent.EntityId === ent.FriendlyName ? "" : " (" + ent.EntityId + ")");
+						entities.push({ Value: ent.EntityId, Text: text });
+					}
 				}
 			}
 			return entities;
+		},
+		homeAssistantEffectRange: function homeAssistantEffectRange() {
+			var m = this.effect.data.hass_method;
+			if (m) {
+				if (m === _EffectData.HomeAssistantMethod.SwitchSet) return [0, 1];
+				if (m === _EffectData.HomeAssistantMethod.DimmerValue) return [0, 255];
+				if (m === _EffectData.HomeAssistantMethod.CoverSet) return [0, 100];
+			}
+			return null;
+		},
+		homeAssistantEffectRangeStr: function homeAssistantEffectRangeStr() {
+			var r = this.homeAssistantEffectRange;
+			if (r) return r[0] + " to " + r[1];
+			return "";
+		},
+		homeAssistantMethods: function homeAssistantMethods() {
+			var e = this.effect.data.hass_entityid;
+			if (e) {
+				if (e.toLowerCase().indexOf("switch.") > -1) return this.SimpleItemList([_EffectData.HomeAssistantMethod.SwitchSet]);
+				if (e.toLowerCase().indexOf("light.") > -1) return this.SimpleItemList([_EffectData.HomeAssistantMethod.DimmerValue, _EffectData.HomeAssistantMethod.SwitchSet]);
+				if (e.toLowerCase().indexOf("cover.") > -1) return this.SimpleItemList([_EffectData.HomeAssistantMethod.CoverSet, _EffectData.HomeAssistantMethod.CoverStop]);
+			}
+			return this.SimpleItemList(["Unknown"]);
 		}
 	},
 	methods: {
@@ -2791,6 +2816,11 @@ exports.default = {
 			for (var i = 0; data && i < data.length; i++) {
 				options.push({ Value: data[i], Text: data[i] });
 			}return options;
+		},
+		validateHomeAssistantMethod: function validateHomeAssistantMethod() {
+			for (var i = 0; i < this.homeAssistantMethods.length; i++) {
+				if (this.homeAssistantMethods[i].Value === this.effect.data.hass_method) return;
+			}this.effect.data.hass_method = this.homeAssistantMethods[0].Value;
 		}
 	},
 	created: function created() {
@@ -2798,10 +2828,28 @@ exports.default = {
 			this.effect.type = _EffectData.EffectType.HttpGet;
 			this.effect.data = {};
 		}
+		this.validateHomeAssistantMethod();
 	},
 	mounted: function mounted() {},
-	beforeDestroy: function beforeDestroy() {}
+	beforeDestroy: function beforeDestroy() {},
+
+	watch: {
+		effect: {
+			deep: true,
+			handler: function handler() {
+				var _this = this;
+
+				this.$nextTick(function () {
+					_this.validateHomeAssistantMethod();
+				});
+			}
+		}
+	}
 }; //
+//
+//
+//
+//
 //
 //
 //
@@ -40991,43 +41039,45 @@ var render = function() {
                           1
                         ),
                         _vm._v(" "),
-                        _c(
-                          "label",
-                          {
-                            attrs: {
-                              title:
-                                "For SwitchSet, 0 or 1.  For DimmerValue, 0 to 255."
-                            }
-                          },
-                          [
-                            _vm._v("Value: "),
-                            _c("input", {
-                              directives: [
-                                {
-                                  name: "model",
-                                  rawName: "v-model",
-                                  value: _vm.effect.data.hass_value,
-                                  expression: "effect.data.hass_value"
-                                }
-                              ],
-                              attrs: { type: "text" },
-                              domProps: { value: _vm.effect.data.hass_value },
-                              on: {
-                                change: _vm.edit,
-                                input: function($event) {
-                                  if ($event.target.composing) {
-                                    return
+                        _vm.homeAssistantEffectRange
+                          ? _c("label", [
+                              _vm._v("\n\t\t\t\tValue: "),
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.effect.data.hass_value,
+                                    expression: "effect.data.hass_value"
                                   }
-                                  _vm.$set(
-                                    _vm.effect.data,
-                                    "hass_value",
-                                    $event.target.value
-                                  )
+                                ],
+                                attrs: {
+                                  type: "number",
+                                  min: _vm.homeAssistantEffectRange[0],
+                                  max: _vm.homeAssistantEffectRange[1]
+                                },
+                                domProps: { value: _vm.effect.data.hass_value },
+                                on: {
+                                  change: _vm.edit,
+                                  input: function($event) {
+                                    if ($event.target.composing) {
+                                      return
+                                    }
+                                    _vm.$set(
+                                      _vm.effect.data,
+                                      "hass_value",
+                                      $event.target.value
+                                    )
+                                  }
                                 }
-                              }
-                            })
-                          ]
-                        )
+                              }),
+                              _c("span", [
+                                _vm._v(
+                                  " " + _vm._s(_vm.homeAssistantEffectRangeStr)
+                                )
+                              ])
+                            ])
+                          : _vm._e()
                       ])
                     : _c("div", { key: "unknownEffectType" }, [
                         _vm._v(
@@ -54096,7 +54146,9 @@ var VeraService = exports.VeraService = {
 };
 var HomeAssistantMethod = exports.HomeAssistantMethod = {
 	DimmerValue: "DimmerValue",
-	SwitchSet: "SwitchSet"
+	SwitchSet: "SwitchSet",
+	CoverStop: "CoverStop",
+	CoverSet: "CoverSet"
 };
 
 var Effect = exports.Effect = function Effect() {

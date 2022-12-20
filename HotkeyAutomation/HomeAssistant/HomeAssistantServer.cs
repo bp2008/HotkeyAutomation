@@ -60,6 +60,8 @@ namespace HotkeyAutomation.HomeAssistant
 						return true;
 					if (s.EntityId.StartsWith("switch.", StringComparison.OrdinalIgnoreCase))
 						return true;
+					if (s.EntityId.StartsWith("cover.", StringComparison.OrdinalIgnoreCase))
+						return true;
 					return false;
 				}).ToList();
 			}
@@ -94,6 +96,42 @@ namespace HotkeyAutomation.HomeAssistant
 					serviceClient.CallService(domain, service, new { entity_id = EntityId, brightness }).Wait();
 				else if (method == HomeAssistantMethod.SwitchSet)
 					serviceClient.CallService(domain, service, new { entity_id = EntityId }).Wait();
+				else
+				{
+					Logger.Info("HomeAssistantServer rejects method " + method + " for entity " + EntityId);
+					return;
+				}
+			}
+			else if (EntityId.StartsWith("cover.", StringComparison.OrdinalIgnoreCase))
+			{
+				domain = "cover";
+				service = "set_cover_position";
+				if (method == HomeAssistantMethod.CoverStop)
+				{
+					service = "stop_cover";
+					serviceClient.CallService(domain, service, new { entity_id = EntityId }).Wait();
+				}
+				else if (method == HomeAssistantMethod.CoverSet)
+				{
+					service = "set_cover_position";
+					if (!int.TryParse(Value, out int position))
+					{
+						Logger.Info("HomeAssistantServer received a non-integer value for " + EntityId + " " + method + ": " + Value);
+						return;
+					}
+					if (position == 0)
+					{
+						service = "close_cover";
+						serviceClient.CallService(domain, service, new { entity_id = EntityId }).Wait();
+					}
+					else if (position == 100)
+					{
+						service = "open_cover";
+						serviceClient.CallService(domain, service, new { entity_id = EntityId }).Wait();
+					}
+					else
+						serviceClient.CallService(domain, service, new { entity_id = EntityId, position }).Wait();
+				}
 				else
 				{
 					Logger.Info("HomeAssistantServer rejects method " + method + " for entity " + EntityId);
