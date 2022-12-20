@@ -184,7 +184,7 @@
 					if (e.toLowerCase().indexOf("cover.") > -1)
 						return this.SimpleItemList([HomeAssistantMethod.CoverSet, HomeAssistantMethod.CoverStop]);
 				}
-				return this.SimpleItemList(["Unknown"]);
+				return this.SimpleItemList([]);
 			}
 		},
 		methods:
@@ -221,10 +221,13 @@
 			},
 			validateHomeAssistantMethod()
 			{
-				for (let i = 0; i < this.homeAssistantMethods.length; i++)
-					if (this.homeAssistantMethods[i].Value === this.effect.data.hass_method)
-						return;
-				this.effect.data.hass_method = this.homeAssistantMethods[0].Value;
+				if (this.homeAssistantMethods.length > 0)
+				{
+					for (let i = 0; i < this.homeAssistantMethods.length; i++)
+						if (this.homeAssistantMethods[i].Value === this.effect.data.hass_method)
+							return;
+					this.effect.data.hass_method = this.homeAssistantMethods[0].Value;
+				}
 			}
 		},
 		created()
