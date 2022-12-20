@@ -45,7 +45,7 @@
 				<label v-if="homeAssistantEffectRange">
 					Value: <input type="number" v-model="effect.data.hass_value" @change="edit"
 							 :min="homeAssistantEffectRange[0]"
-							 :max="homeAssistantEffectRange[1]" /><span> {{homeAssistantEffectRangeStr}}</span>
+							 :max="homeAssistantEffectRange[1]" /><span> ({{homeAssistantEffectRangeStr}})</span>
 				</label>
 			</div>
 			<div v-else key="unknownEffectType">

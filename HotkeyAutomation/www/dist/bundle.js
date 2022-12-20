@@ -41073,7 +41073,9 @@ var render = function() {
                               }),
                               _c("span", [
                                 _vm._v(
-                                  " " + _vm._s(_vm.homeAssistantEffectRangeStr)
+                                  " (" +
+                                    _vm._s(_vm.homeAssistantEffectRangeStr) +
+                                    ")"
                                 )
                               ])
                             ])
