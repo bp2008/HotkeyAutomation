@@ -142,6 +142,8 @@ namespace HotkeyAutomation.BroadLinkRM
 		{
 			if (device == null || consecutiveCommandFailures >= 5)
 				LoadDeviceInfo_Throttled();
+			if (device == null)
+				throw new Exception("Unable to load Broadlink device \"" + host + "\".");
 			lock (myLock)
 			{
 				BroadLinkCmd cmd = BroadLinkCommands.commands.Get(commandId);
@@ -329,7 +331,7 @@ namespace HotkeyAutomation.BroadLinkRM
 					Task<List<BroadlinkDevice>> discoveryTask = broadlinkClient.DiscoverAsync(3000, targetDeviceAddr: targetAddr);
 					discoveryTask.Wait();
 					if (discoveryTask.IsCompleted)
-						return (RMDevice)discoveryTask.Result.FirstOrDefault(d => d.EndPoint.Address == targetAddr);
+						return (RMDevice)discoveryTask.Result.FirstOrDefault(d => targetAddr.Equals(d.EndPoint.Address));
 					return null;
 				}
 			}
