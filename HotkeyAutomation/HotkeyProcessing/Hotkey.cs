@@ -15,6 +15,10 @@ namespace HotkeyAutomation.HotkeyProcessing
 				return ConsoleKeyHelper.GetKeyName(key.Value);
 			}
 		}
+		/// <summary>
+		/// If true, the hotkey will only activate if pressed twice within a short time.
+		/// </summary>
+		public bool doublePress;
 		public Effect[] effects;
 	}
 }

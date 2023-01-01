@@ -3,6 +3,7 @@
 	public enum EffectType
 	{
 		HttpGet,
+		HttpPost,
 		BroadLink,
 		iTach,
 		Vera,

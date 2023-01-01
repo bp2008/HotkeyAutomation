@@ -15,6 +15,11 @@
 			<div v-if="effect.type === EffectType.HttpGet" key="httpget">
 				<label class="wide">URL: <input type="text" v-model="effect.data.httpget_url" @change="edit" /></label>
 			</div>
+			<div v-if="effect.type === EffectType.HttpPost" key="httppost">
+				<label class="wide">URL: <input type="text" v-model="effect.data.httppost_url" @change="edit" /></label>
+				<label class="wide" title="If empty, defaults to &quot;application/x-www-form-urlencoded&quot;">Content-Type: <input type="text" v-model="effect.data.httppost_content_type" @change="edit" placeholder="application/x-www-form-urlencoded" /></label>
+				<label class="wide">POST Body: <input type="text" v-model="effect.data.httppost_body" @change="edit" /></label>
+			</div>
 			<div v-else-if="effect.type === EffectType.BroadLink" key="broadlink">
 				<label>BroadLink Name: <VSelect v-model="effect.data.broadlink_name" :options="broadlinkNameOptions" @change="edit" /></label>
 				<label>Command Name: <VSelect v-model="effect.data.broadlink_commandName" :options="broadlinkCommandOptions" @change="edit" /></label>
@@ -75,7 +80,7 @@
 				EffectType: EffectType,
 				VeraService: VeraService,
 				HomeAssistantMethod: HomeAssistantMethod,
-				effectTypes: this.SimpleItemList([EffectType.HttpGet, EffectType.BroadLink, EffectType.iTach, EffectType.Vera, EffectType.HomeAssistant]),
+				effectTypes: this.SimpleItemList([EffectType.HttpGet, EffectType.HttpPost, EffectType.BroadLink, EffectType.iTach, EffectType.Vera, EffectType.HomeAssistant]),
 				veraServices: this.SimpleItemList([VeraService.DimmerValue, VeraService.SwitchSet, VeraService.CurtainStop]),
 				deleting: false
 			};

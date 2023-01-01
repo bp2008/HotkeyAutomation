@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -145,9 +147,44 @@ namespace HotkeyAutomation.HotkeyProcessing
 				ExecuteHotkey(hotkey);
 			});
 		}
-
+		private static ConcurrentDictionary<int, long> hotkeyLastPressTimes = new ConcurrentDictionary<int, long>();
+		private static Stopwatch hotkeyStopwatch = Stopwatch.StartNew();
+		/// <summary>
+		/// Hotkeys that require double press must be pressed twice within this number of milliseconds.
+		/// </summary>
+		private static long hotkeyDoublePressInterval = 1000;
+		/// <summary>
+		/// Gets the time elapsed since this class started measuring time.
+		/// </summary>
+		private static long hotkeyPressTimeNow
+		{
+			get
+			{
+				return hotkeyStopwatch.ElapsedMilliseconds;
+			}
+		}
 		private static void ExecuteHotkey(Hotkey hotkey)
 		{
+			if (hotkey.doublePress)
+			{
+				if (!hotkeyLastPressTimes.TryGetValue(hotkey.id, out long lastPressTime))
+				{
+					// First press of sequence has not occurred
+					//Logger.Info("Hotkey " + hotkey.id + " beginning double-press sequence.");
+					hotkeyLastPressTimes[hotkey.id] = hotkeyPressTimeNow;
+					return;
+				}
+				if (hotkeyPressTimeNow > lastPressTime + hotkeyDoublePressInterval)
+				{
+					// First press of sequence was too long ago. Begin new sequence.
+					//Logger.Info("Hotkey " + hotkey.id + " pressed too late. Beginning new double-press sequence.");
+					hotkeyLastPressTimes[hotkey.id] = hotkeyPressTimeNow;
+					return;
+				}
+				// If we get here, the double press sequence has completed successfully.
+				//Logger.Info("Hotkey " + hotkey.id + " was double-pressed and will now execute effects.");
+				hotkeyLastPressTimes.TryRemove(hotkey.id, out lastPressTime);
+			}
 			ParallelOptions parallelOptions = new ParallelOptions();
 			parallelOptions.MaxDegreeOfParallelism = 16;
 			Parallel.ForEach(hotkey.effects, parallelOptions, effect =>
@@ -158,6 +195,20 @@ namespace HotkeyAutomation.HotkeyProcessing
 						{
 							if (!string.IsNullOrWhiteSpace(effect.data.httpget_url) && Uri.TryCreate(effect.data.httpget_url, UriKind.Absolute, out Uri result))
 								http_fast.GET(effect.data.httpget_url);
+							else
+								Logger.Info("Can't GET Invalid URL: " + effect.data.httpget_url);
+							break;
+						}
+					case EffectType.HttpPost:
+						{
+							if (!string.IsNullOrWhiteSpace(effect.data.httppost_url) && Uri.TryCreate(effect.data.httppost_url, UriKind.Absolute, out Uri result))
+							{
+								string ContentType = string.IsNullOrWhiteSpace(effect.data.httppost_content_type) ? "application/x-www-form-urlencoded" : effect.data.httppost_content_type;
+								byte[] body = effect.data.httppost_body == null ? new byte[0] : ByteUtil.Utf8NoBOM.GetBytes(effect.data.httppost_body);
+								http_fast.POST(effect.data.httppost_url, body, ContentType);
+							}
+							else
+								Logger.Info("Can't POST to Invalid URL: " + effect.data.httppost_url);
 							break;
 						}
 					case EffectType.BroadLink:

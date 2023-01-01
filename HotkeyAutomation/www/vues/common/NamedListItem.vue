@@ -22,8 +22,9 @@
 			<span v-if="isHotkey" class="keyReadout">{{item.keyName}}</span>
 			<span v-if="isBroadlinkCmd" title="Learn new codes"><svg @click="$emit('learnCodes')"><use xlink:href="#input"></use></svg></span>
 			<span v-if="isBroadlinkCmd" class="keyReadout">{{item.codes ? "Codes Learned" : ""}}</span>
-			<router-link v-if="isBroadlinkController" :to="{ name: 'broadlinkcmds', params: { controllerId: this.item.id } }">Manage Commands</router-link>
+			<router-link v-if="isBroadlinkController" :to="{ name: 'broadlinkcmds', params: { controllerId: this.item.id.toString() } }">Manage Commands</router-link>
 			<div class="buttons">
+				<label v-if="isHotkey" title="If checked, the hotkey will only activate if pressed twice in a short time period."><input type="checkbox" v-model="item.doublePress"  @change="edit" /> Dbl</label>
 				<ScaleLoader :class="{ scaleLoader: true, visible: working }"></ScaleLoader>
 				<span title="Drag me!" class="listItem_dragHandle"><svg><use xlink:href="#arrows"></use></svg></span>
 				<span :title="('Delete this ' + itemType)"><svg @click="removeClick"><use xlink:href="#remove"></use></svg></span>

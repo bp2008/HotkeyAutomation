@@ -11,6 +11,11 @@ namespace HotkeyAutomation.HotkeyProcessing
 		#region HttpGet
 		public string httpget_url;
 		#endregion
+		#region HttpPost
+		public string httppost_url;
+		public string httppost_content_type;
+		public string httppost_body;
+		#endregion
 		#region BroadLink
 		public string broadlink_name;
 		public string broadlink_commandName;

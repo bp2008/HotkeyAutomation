@@ -1,5 +1,6 @@
 ﻿export var EffectType = {
 	HttpGet: "HttpGet",
+	HttpPost: "HttpPost",
 	BroadLink: "BroadLink",
 	iTach: "iTach",
 	Vera: "Vera",
@@ -29,6 +30,9 @@ export class EffectData
 	constructor()
 	{
 		this.httpget_url = null;
+		this.httppost_url = null;
+		this.httppost_content_type = null;
+		this.httppost_body = null;
 		this.broadlink_name = null;
 		this.broadlink_commandName = null;
 		this.broadlink_repeatCount = 0;

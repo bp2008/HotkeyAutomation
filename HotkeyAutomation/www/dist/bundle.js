@@ -1847,6 +1847,7 @@ exports.default = {
 //
 //
 //
+//
 
 /***/ }),
 
@@ -2708,7 +2709,7 @@ exports.default = {
 			EffectType: _EffectData.EffectType,
 			VeraService: _EffectData.VeraService,
 			HomeAssistantMethod: _EffectData.HomeAssistantMethod,
-			effectTypes: this.SimpleItemList([_EffectData.EffectType.HttpGet, _EffectData.EffectType.BroadLink, _EffectData.EffectType.iTach, _EffectData.EffectType.Vera, _EffectData.EffectType.HomeAssistant]),
+			effectTypes: this.SimpleItemList([_EffectData.EffectType.HttpGet, _EffectData.EffectType.HttpPost, _EffectData.EffectType.BroadLink, _EffectData.EffectType.iTach, _EffectData.EffectType.Vera, _EffectData.EffectType.HomeAssistant]),
 			veraServices: this.SimpleItemList([_EffectData.VeraService.DimmerValue, _EffectData.VeraService.SwitchSet, _EffectData.VeraService.CurtainStop]),
 			deleting: false
 		};
@@ -2848,6 +2849,11 @@ exports.default = {
 		}
 	}
 }; //
+//
+//
+//
+//
+//
 //
 //
 //
@@ -39926,7 +39932,7 @@ var render = function() {
                   attrs: {
                     to: {
                       name: "broadlinkcmds",
-                      params: { controllerId: this.item.id }
+                      params: { controllerId: this.item.id.toString() }
                     }
                   }
                 },
@@ -39938,6 +39944,70 @@ var render = function() {
             "div",
             { staticClass: "buttons" },
             [
+              _vm.isHotkey
+                ? _c(
+                    "label",
+                    {
+                      attrs: {
+                        title:
+                          "If checked, the hotkey will only activate if pressed twice in a short time period."
+                      }
+                    },
+                    [
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.item.doublePress,
+                            expression: "item.doublePress"
+                          }
+                        ],
+                        attrs: { type: "checkbox" },
+                        domProps: {
+                          checked: Array.isArray(_vm.item.doublePress)
+                            ? _vm._i(_vm.item.doublePress, null) > -1
+                            : _vm.item.doublePress
+                        },
+                        on: {
+                          change: [
+                            function($event) {
+                              var $$a = _vm.item.doublePress,
+                                $$el = $event.target,
+                                $$c = $$el.checked ? true : false
+                              if (Array.isArray($$a)) {
+                                var $$v = null,
+                                  $$i = _vm._i($$a, $$v)
+                                if ($$el.checked) {
+                                  $$i < 0 &&
+                                    _vm.$set(
+                                      _vm.item,
+                                      "doublePress",
+                                      $$a.concat([$$v])
+                                    )
+                                } else {
+                                  $$i > -1 &&
+                                    _vm.$set(
+                                      _vm.item,
+                                      "doublePress",
+                                      $$a
+                                        .slice(0, $$i)
+                                        .concat($$a.slice($$i + 1))
+                                    )
+                                }
+                              } else {
+                                _vm.$set(_vm.item, "doublePress", $$c)
+                              }
+                            },
+                            _vm.edit
+                          ]
+                        }
+                      }),
+                      _vm._v(" Dbl")
+                    ]
+                  )
+                : _vm._e(),
+              _vm._v(" "),
               _c("ScaleLoader", {
                 class: { scaleLoader: true, visible: _vm.working }
               }),
@@ -40689,6 +40759,112 @@ var render = function() {
                         _vm.$set(
                           _vm.effect.data,
                           "httpget_url",
+                          $event.target.value
+                        )
+                      }
+                    }
+                  })
+                ])
+              ])
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.effect.type === _vm.EffectType.HttpPost
+            ? _c("div", { key: "httppost" }, [
+                _c("label", { staticClass: "wide" }, [
+                  _vm._v("URL: "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.effect.data.httppost_url,
+                        expression: "effect.data.httppost_url"
+                      }
+                    ],
+                    attrs: { type: "text" },
+                    domProps: { value: _vm.effect.data.httppost_url },
+                    on: {
+                      change: _vm.edit,
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.$set(
+                          _vm.effect.data,
+                          "httppost_url",
+                          $event.target.value
+                        )
+                      }
+                    }
+                  })
+                ]),
+                _vm._v(" "),
+                _c(
+                  "label",
+                  {
+                    staticClass: "wide",
+                    attrs: {
+                      title:
+                        'If empty, defaults to "application/x-www-form-urlencoded"'
+                    }
+                  },
+                  [
+                    _vm._v("Content-Type: "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.effect.data.httppost_content_type,
+                          expression: "effect.data.httppost_content_type"
+                        }
+                      ],
+                      attrs: {
+                        type: "text",
+                        placeholder: "application/x-www-form-urlencoded"
+                      },
+                      domProps: {
+                        value: _vm.effect.data.httppost_content_type
+                      },
+                      on: {
+                        change: _vm.edit,
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(
+                            _vm.effect.data,
+                            "httppost_content_type",
+                            $event.target.value
+                          )
+                        }
+                      }
+                    })
+                  ]
+                ),
+                _vm._v(" "),
+                _c("label", { staticClass: "wide" }, [
+                  _vm._v("POST Body: "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.effect.data.httppost_body,
+                        expression: "effect.data.httppost_body"
+                      }
+                    ],
+                    attrs: { type: "text" },
+                    domProps: { value: _vm.effect.data.httppost_body },
+                    on: {
+                      change: _vm.edit,
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.$set(
+                          _vm.effect.data,
+                          "httppost_body",
                           $event.target.value
                         )
                       }
@@ -54138,6 +54314,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var EffectType = exports.EffectType = {
 	HttpGet: "HttpGet",
+	HttpPost: "HttpPost",
 	BroadLink: "BroadLink",
 	iTach: "iTach",
 	Vera: "Vera",
@@ -54166,6 +54343,9 @@ var EffectData = exports.EffectData = function EffectData() {
 	_classCallCheck(this, EffectData);
 
 	this.httpget_url = null;
+	this.httppost_url = null;
+	this.httppost_content_type = null;
+	this.httppost_body = null;
 	this.broadlink_name = null;
 	this.broadlink_commandName = null;
 	this.broadlink_repeatCount = 0;
