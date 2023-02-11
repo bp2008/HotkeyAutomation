@@ -7,7 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HotkeyAutomation.HomeAssistant
@@ -25,6 +27,22 @@ namespace HotkeyAutomation.HomeAssistant
 		protected ServiceClient serviceClient;
 
 		protected List<StateObject> states;
+		/// <summary>
+		/// Millisecond round-trip-time of the last ping to this Home Assistant Server.
+		/// </summary>
+		public int? lastPingReplyMs = null;
+		/// <summary>
+		/// Basically read-only, gets the hostname from the URL.
+		/// </summary>
+		public string host
+		{
+			get
+			{
+				if (url != null && Uri.TryCreate(url, UriKind.Absolute, out Uri u))
+					return u.Host;
+				return null;
+			}
+		}
 
 		public HomeAssistantServer()
 		{
@@ -39,10 +57,67 @@ namespace HotkeyAutomation.HomeAssistant
 						ClientFactory.Initialize(url, apiKey);
 						statesClient = ClientFactory.GetClient<StatesClient>();
 						serviceClient = ClientFactory.GetClient<ServiceClient>();
+
+						Thread thr = new Thread(PingThread);
+						thr.Name = "HomeAssistant Pinging Thread";
+						thr.IsBackground = true;
+						thr.Start();
+
 						initialized = true;
 					}
 				}
 		}
+
+		private void PingThread()
+		{
+			try
+			{
+				CountdownStopwatch csPingTimer = CountdownStopwatch.StartNew(TimeSpan.FromSeconds(3));
+				string lastUrl = null;
+				string lastHost = null;
+				using (Ping pinger = new Ping())
+				{
+					while (true)
+					{
+						try
+						{
+							if (ServiceWrapper.IsRunning && url != null)
+							{
+								if (lastUrl == null || lastUrl != url)
+								{
+									lastHost = host;
+									lastUrl = url;
+								}
+								if (lastHost != null)
+								{
+									PingReply reply = pinger.Send(lastHost, 3000);
+									if (reply.Status == IPStatus.Success)
+										lastPingReplyMs = (int)reply.RoundtripTime;
+									else
+										lastPingReplyMs = null;
+								}
+								else
+								{
+									lastPingReplyMs = null;
+								}
+							}
+
+							csPingTimer.SleepUntilZero();
+							csPingTimer.Restart();
+						}
+						catch (Exception ex)
+						{
+							Logger.Debug(ex);
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Logger.Debug(ex);
+			}
+		}
+
 		/// <summary>
 		/// Loads the entity states list, returning true if succesful.
 		/// </summary>

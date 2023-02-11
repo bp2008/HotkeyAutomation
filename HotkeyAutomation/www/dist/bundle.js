@@ -1848,6 +1848,10 @@ exports.default = {
 //
 //
 //
+//
+//
+//
+//
 
 /***/ }),
 
@@ -39886,6 +39890,20 @@ var render = function() {
                     }
                   }
                 })
+              ])
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.isHomeAssistantServer
+            ? _c("span", { attrs: { title: "round-trip-time milliseconds" } }, [
+                _vm._v(
+                  "\n\t\t\tRTT: " +
+                    _vm._s(
+                      _vm.item.lastPingReplyMs === null
+                        ? "~"
+                        : _vm.item.lastPingReplyMs
+                    ) +
+                    "ms\n\t\t"
+                )
               ])
             : _vm._e(),
           _vm._v(" "),

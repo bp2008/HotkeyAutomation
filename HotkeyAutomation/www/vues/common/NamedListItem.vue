@@ -18,13 +18,17 @@
 				API KEY:
 				<input class="apiKey" type="text" v-model="item.apiKey" placeholder="01234567890abcdef" @change="edit" />
 			</label>
+			<span v-if="isHomeAssistantServer" title="round-trip-time milliseconds">
+				<!-- We ping each Home Assistant Server every 3 seconds as an attempt to keep the network path fresh so that commands to this device can be fast. -->
+				RTT: {{item.lastPingReplyMs === null ? "~" : item.lastPingReplyMs}}ms
+			</span>
 			<span v-if="isHotkey" title="Bind new key"><svg @click="hotkeyListen"><use xlink:href="#input"></use></svg></span>
 			<span v-if="isHotkey" class="keyReadout">{{item.keyName}}</span>
 			<span v-if="isBroadlinkCmd" title="Learn new codes"><svg @click="$emit('learnCodes')"><use xlink:href="#input"></use></svg></span>
 			<span v-if="isBroadlinkCmd" class="keyReadout">{{item.codes ? "Codes Learned" : ""}}</span>
 			<router-link v-if="isBroadlinkController" :to="{ name: 'broadlinkcmds', params: { controllerId: this.item.id.toString() } }">Manage Commands</router-link>
 			<div class="buttons">
-				<label v-if="isHotkey" title="If checked, the hotkey will only activate if pressed twice in a short time period."><input type="checkbox" v-model="item.doublePress"  @change="edit" /> Dbl</label>
+				<label v-if="isHotkey" title="If checked, the hotkey will only activate if pressed twice in a short time period."><input type="checkbox" v-model="item.doublePress" @change="edit" /> Dbl</label>
 				<ScaleLoader :class="{ scaleLoader: true, visible: working }"></ScaleLoader>
 				<span title="Drag me!" class="listItem_dragHandle"><svg><use xlink:href="#arrows"></use></svg></span>
 				<span :title="('Delete this ' + itemType)"><svg @click="removeClick"><use xlink:href="#remove"></use></svg></span>

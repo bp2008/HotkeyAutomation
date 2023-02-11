@@ -19,6 +19,7 @@ namespace HotkeyAutomation
 		public static StreamingLogReader logReader;
 		public static string iTachCommandsFile = "";
 		public static string BroadLinkCommandsFile = "";
+		public static bool IsRunning { get; private set; }
 
 		public static void Initialize()
 		{
@@ -59,7 +60,7 @@ namespace HotkeyAutomation
 				thr.IsBackground = true;
 				thr.Start();
 			}
-			
+
 			foreach (HomeAssistant.HomeAssistantServer hass in config.homeAssistantServers.List())
 			{
 				Thread thr = new Thread(() =>
@@ -83,11 +84,13 @@ namespace HotkeyAutomation
 
 		public static void Start()
 		{
+			IsRunning = true;
 			Logger.StartLoggingThreads();
 			httpServer.Start();
 		}
 		public static void Stop()
 		{
+			IsRunning = false;
 			Try.Catch(() => { httpServer?.Stop(); });
 			Try.Catch(Logger.StopLoggingThreads);
 		}
