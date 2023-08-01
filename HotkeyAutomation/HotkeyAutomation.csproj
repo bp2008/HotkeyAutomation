@@ -185,7 +185,8 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>cd "$(ProjectDir)"
-node "$(ProjectDir)node_modules\webpack\bin\webpack"
+set NODE_OPTIONS=--openssl-legacy-provider
+node "$(ProjectDir)node_modules\webpack\bin\webpack" --no-color --env=$(ConfigurationName)
 xcopy "$(ProjectDir)www" "$(TargetDir)www" /E /C /R /Y /I /Q</PostBuildEvent>
   </PropertyGroup>
 </Project>

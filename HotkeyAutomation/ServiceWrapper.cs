@@ -72,7 +72,7 @@ namespace HotkeyAutomation
 				thr.Start();
 			}
 
-			httpServer = new WebServer(config.httpPort);
+			httpServer = new WebServer();
 			httpServer.SocketBound += HttpServer_SocketBound;
 		}
 
@@ -86,7 +86,7 @@ namespace HotkeyAutomation
 		{
 			IsRunning = true;
 			Logger.StartLoggingThreads();
-			httpServer.Start();
+			httpServer.SetBindings(config.httpPort);
 		}
 		public static void Stop()
 		{

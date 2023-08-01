@@ -22,7 +22,7 @@ namespace HotkeyAutomation
 	{
 		private static bool enableCaching = true;
 		private WebpackProxy webpackProxy = null;
-		public WebServer(int port, int httpsPort = -1, X509Certificate2 cert = null) : base(port, httpsPort, cert)
+		public WebServer(X509Certificate2 cert = null) : base(SimpleCertificateSelector.FromCertificate(cert))
 		{
 			if (ServiceWrapper.config.devMode)
 			{
@@ -71,8 +71,8 @@ namespace HotkeyAutomation
 				else if (pageLower == "downloadconfiguration")
 				{
 					string filename = "HotkeyAutomationConfig_" + Environment.MachineName + "_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".zip";
-					List<KeyValuePair<string, string>> additionalHeaders = new List<KeyValuePair<string, string>>();
-					additionalHeaders.Add(new KeyValuePair<string, string>("Content-Disposition", "attachment; filename=\"" + filename + "\""));
+					HttpHeaderCollection additionalHeaders = new HttpHeaderCollection();
+					additionalHeaders.Add("Content-Disposition", "attachment; filename=\"" + filename + "\"");
 					p.writeSuccess("application/zip", additionalHeaders: additionalHeaders);
 					p.outputStream.Flush();
 					ConfigurationIO.WriteToStream(p.tcpStream);
@@ -177,9 +177,9 @@ namespace HotkeyAutomation
 			return new FileInfo(wwwDirectoryBase + "Default.html");
 		}
 
-		private List<KeyValuePair<string, string>> GetCacheEtagHeaders(TimeSpan maxAge, string etag)
+		private HttpHeaderCollection GetCacheEtagHeaders(TimeSpan maxAge, string etag)
 		{
-			List<KeyValuePair<string, string>> additionalHeaders = new List<KeyValuePair<string, string>>();
+			HttpHeaderCollection additionalHeaders = new HttpHeaderCollection();
 			if (enableCaching)
 			{
 				additionalHeaders.Add(new KeyValuePair<string, string>("Cache-Control", "max-age=" + (long)maxAge.TotalSeconds + ", public"));
@@ -187,9 +187,9 @@ namespace HotkeyAutomation
 			}
 			return additionalHeaders;
 		}
-		private List<KeyValuePair<string, string>> GetCacheLastModifiedHeaders(TimeSpan maxAge, DateTime lastModifiedUTC)
+		private HttpHeaderCollection GetCacheLastModifiedHeaders(TimeSpan maxAge, DateTime lastModifiedUTC)
 		{
-			List<KeyValuePair<string, string>> additionalHeaders = new List<KeyValuePair<string, string>>();
+			HttpHeaderCollection additionalHeaders = new HttpHeaderCollection();
 			if (enableCaching)
 			{
 				additionalHeaders.Add(new KeyValuePair<string, string>("Cache-Control", "max-age=" + (long)maxAge.TotalSeconds + ", public"));
@@ -208,7 +208,7 @@ namespace HotkeyAutomation
 			}
 			else if (pageLower == "uploadconfiguration")
 			{
-				bool success = ConfigurationIO.ReadFromStream(p.PostBodyStream);
+				bool success = ConfigurationIO.ReadFromStream(p.RequestBodyStream);
 				p.writeSuccess("text/plain", 1);
 				p.outputStream.Write(success ? "1" : "0");
 				if (success)
