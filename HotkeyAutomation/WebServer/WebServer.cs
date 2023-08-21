@@ -198,36 +198,42 @@ namespace HotkeyAutomation
 			return additionalHeaders;
 		}
 
-		public override void handlePOSTRequest(HttpProcessor p, StreamReader inputData)
+		public override void handlePOSTRequest(HttpProcessor p)
 		{
+			if (!ByteUtil.ReadToEndWithMaxLength(p.RequestBodyStream, 10 * 1024 * 1024, out byte[] data))
+				data = new byte[0];
+
 			string pageLower = p.requestedPage.ToLower();
 			p.tcpClient.NoDelay = true;
 			if (pageLower == "json")
 			{
-				JSONAPI.HandleRequest(p, inputData.ReadToEnd());
+				JSONAPI.HandleRequest(p, ByteUtil.Utf8NoBOM.GetString(data));
 			}
 			else if (pageLower == "uploadconfiguration")
 			{
-				bool success = ConfigurationIO.ReadFromStream(p.RequestBodyStream);
-				p.writeSuccess("text/plain", 1);
-				p.outputStream.Write(success ? "1" : "0");
-				if (success)
+				using (MemoryStream ms = new MemoryStream(data))
 				{
-					Thread thrRestartSelf = new Thread(() =>
+					bool success = ConfigurationIO.ReadFromStream(ms);
+					p.writeSuccess("text/plain", 1);
+					p.outputStream.Write(success ? "1" : "0");
+					if (success)
 					{
-						try
+						Thread thrRestartSelf = new Thread(() =>
 						{
-							Thread.Sleep(1000);
-							Program.restartNow = true;
-						}
-						catch (Exception ex)
-						{
-							Logger.Debug(ex);
-						}
-					});
-					thrRestartSelf.Name = "Restart Self";
-					thrRestartSelf.IsBackground = true;
-					thrRestartSelf.Start();
+							try
+							{
+								Thread.Sleep(1000);
+								Program.restartNow = true;
+							}
+							catch (Exception ex)
+							{
+								Logger.Debug(ex);
+							}
+						});
+						thrRestartSelf.Name = "Restart Self";
+						thrRestartSelf.IsBackground = true;
+						thrRestartSelf.Start();
+					}
 				}
 			}
 		}
