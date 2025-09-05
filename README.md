@@ -25,7 +25,7 @@ Navigate a web browser to the IP address of your raspberry pi.  The HotkeyAutoma
 
 ### Troubleshooting
 
-This application is currently not set up to handle browser caching properly.  If you update the application, please clear your browser caches to avoid errors when using the web interface.
+If you use the configuration file upload function, it is strongly advised to restart the program manually afterward because the built-in restart function is buggy.
 
 ### Building from source
 
