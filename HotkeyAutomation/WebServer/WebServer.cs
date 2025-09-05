@@ -67,10 +67,14 @@ namespace HotkeyAutomation
 				else if (pageLower == "downloadconfiguration")
 				{
 					string filename = "HotkeyAutomationConfig_" + Environment.MachineName + "_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".zip";
+					byte[] fileData;
+					using (MemoryStream ms = new MemoryStream())
+					{
+						ConfigurationIO.WriteToStream(ms);
+						fileData = ms.ToArray();
+					}
+					p.Response.FullResponseBytes(fileData, "application/zip");
 					p.Response.Headers.Add("Content-Disposition", "attachment; filename=\"" + filename + "\"");
-					p.Response.ContentType = "application/zip";
-					Stream stream = p.Response.GetResponseStreamSync();
-					ConfigurationIO.WriteToStream(stream);
 				}
 				else
 				{

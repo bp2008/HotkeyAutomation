@@ -17,6 +17,7 @@ namespace HotkeyAutomation
 	{
 		public string systemName = "HotkeyAutomation";
 		public int httpPort = 80;
+		public int httpsPort = -1;
 		public bool devMode = false;
 		/// <summary>
 		/// If greater than 0, we'll try to operate an active buzzer on this GPIO number.

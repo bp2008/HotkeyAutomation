@@ -23,6 +23,7 @@
 		<h2>Buzzer Configuration</h2>
 		<p>This software can be configured so that upon keypress, sound is emitted from an active buzzer attached to a GPIO pin.  Only tested on Raspberry PI.</p>
 		<p>If you set the GPIO number to a value greater than 0, we'll try to use a buzzer attached to that pin.</p>
+		<p><i>This feature is disabled on Windows.</i></p>
 		<div v-if="buzzerCfg">
 			<div>
 				<label>Buzzer GPIO Number: <input type="number" min="0" max="30" v-model="buzzerCfg.buzzerGpioNumber" /></label>

@@ -85,7 +85,7 @@ namespace HotkeyAutomation
 		public static void Start()
 		{
 			IsRunning = true;
-			httpServer.SetBindings(config.httpPort);
+			httpServer.SetBindings(config.httpPort, config.httpsPort < 0 ? -1 : config.httpsPort);
 		}
 		public static void Stop()
 		{

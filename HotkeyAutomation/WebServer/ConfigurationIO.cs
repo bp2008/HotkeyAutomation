@@ -1,7 +1,7 @@
 ﻿using BPUtil;
-using Ionic.Zip;
 using System;
 using System.IO;
+using System.IO.Compression;
 
 namespace HotkeyAutomation
 {
@@ -15,21 +15,27 @@ namespace HotkeyAutomation
 		public static bool ReadFromStream(Stream zipInputStream)
 		{
 			bool success = false;
-			using (ZipFile zipper = ZipFile.Read(zipInputStream))
+			using (ZipArchive archive = new ZipArchive(zipInputStream, ZipArchiveMode.Read, leaveOpen: true))
 			{
-				foreach(ZipEntry zipEntry in zipper)
+				foreach (ZipArchiveEntry entry in archive.Entries)
 				{
-					if (zipEntry.FileName.Equals("iTachCommands.json", StringComparison.OrdinalIgnoreCase)
-						|| zipEntry.FileName.Equals("BroadLinkCommands.json", StringComparison.OrdinalIgnoreCase)
-						|| zipEntry.FileName.Equals("HotkeyConfig.cfg", StringComparison.OrdinalIgnoreCase))
+					if (entry.Name.IEquals("iTachCommands.json")
+						|| entry.Name.IEquals("BroadLinkCommands.json")
+						|| entry.Name.IEquals("HotkeyConfig.cfg"))
 					{
-						zipEntry.Extract(Globals.ApplicationDirectoryBase, ExtractExistingFileAction.OverwriteSilently);
+						string outputPath = Path.Combine(Globals.ApplicationDirectoryBase, entry.Name);
+						using (Stream entryStream = entry.Open())
+						using (FileStream fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None))
+						{
+							entryStream.CopyTo(fileStream);
+						}
 						success = true;
 					}
 				}
 			}
 			return success;
 		}
+
 		/// <summary>
 		/// Writes zipped configuration data to the specified stream.
 		/// </summary>
@@ -38,44 +44,26 @@ namespace HotkeyAutomation
 		public static bool WriteToStream(Stream zipOutputStream)
 		{
 			bool success = false;
-
-			// So ... writing with ZipOutputStream doesn't work.  It throws an exception when writing the first file.
-
-			//using (ZipOutputStream zipper = new ZipOutputStream(zipOutputStream, true))
-			using (ZipFile zipper = new ZipFile())
+			using (ZipArchive archive = new ZipArchive(zipOutputStream, ZipArchiveMode.Create, leaveOpen: true))
 			{
-				zipper.CompressionMethod = CompressionMethod.Deflate;
-				zipper.CompressionLevel = Ionic.Zlib.CompressionLevel.BestSpeed;
-
-				success |= AddFileIfExists(zipper, Path.Combine(Globals.ApplicationDirectoryBase, "iTachCommands.json"));
-				success |= AddFileIfExists(zipper, Path.Combine(Globals.ApplicationDirectoryBase, "BroadLinkCommands.json"));
-				success |= AddFileIfExists(zipper, Path.Combine(Globals.ApplicationDirectoryBase, "HotkeyConfig.cfg"));
-
-				zipper.Save(zipOutputStream);
+				success |= AddFileIfExists(archive, Path.Combine(Globals.ApplicationDirectoryBase, "iTachCommands.json"));
+				success |= AddFileIfExists(archive, Path.Combine(Globals.ApplicationDirectoryBase, "BroadLinkCommands.json"));
+				success |= AddFileIfExists(archive, Path.Combine(Globals.ApplicationDirectoryBase, "HotkeyConfig.cfg"));
 			}
 			return success;
 		}
-		private static bool AddFileIfExists(ZipOutputStream zos, string filePath)
+
+		private static bool AddFileIfExists(ZipArchive archive, string filePath)
 		{
 			FileInfo fi = new FileInfo(filePath);
 			if (fi.Exists)
 			{
-				zos.PutNextEntry(fi.Name);
-				using (FileStream fsInput = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+				ZipArchiveEntry entry = archive.CreateEntry(fi.Name, CompressionLevel.Fastest);
+				using (Stream entryStream = entry.Open())
+				using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
 				{
-					fsInput.CopyTo(zos);
+					fileStream.CopyTo(entryStream);
 				}
-				return true;
-			}
-			return false;
-		}
-		private static bool AddFileIfExists(ZipFile zipFile, string filePath)
-		{
-			FileInfo fi = new FileInfo(filePath);
-			if (fi.Exists)
-			{
-				byte[] buffer = File.ReadAllBytes(filePath);
-				zipFile.AddEntry(fi.Name, buffer);
 				return true;
 			}
 			return false;

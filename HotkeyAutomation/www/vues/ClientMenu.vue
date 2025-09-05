@@ -71,4 +71,8 @@
 			flex-direction: row;
 		}
 	}*/
+	.nav-item
+	{
+		word-break: break-word;
+	}
 </style>
