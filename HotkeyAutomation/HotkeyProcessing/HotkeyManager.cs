@@ -43,6 +43,7 @@ namespace HotkeyAutomation.HotkeyProcessing
 		{
 			try
 			{
+				ServiceWrapper.ActivateBuzzer(50);
 				if (HandlePossibleKeybind(key))
 					return;
 				TriggerHotkeys(key);
@@ -194,7 +195,10 @@ namespace HotkeyAutomation.HotkeyProcessing
 					case EffectType.HttpGet:
 						{
 							if (!string.IsNullOrWhiteSpace(effect.data.httpget_url) && Uri.TryCreate(effect.data.httpget_url, UriKind.Absolute, out Uri result))
+							{
 								http_fast.GET(effect.data.httpget_url);
+								ServiceWrapper.ActivateBuzzer(250);
+							}
 							else
 								Logger.Info("Can't GET Invalid URL: " + effect.data.httpget_url);
 							break;
@@ -206,6 +210,7 @@ namespace HotkeyAutomation.HotkeyProcessing
 								string ContentType = string.IsNullOrWhiteSpace(effect.data.httppost_content_type) ? "application/x-www-form-urlencoded" : effect.data.httppost_content_type;
 								byte[] body = effect.data.httppost_body == null ? new byte[0] : ByteUtil.Utf8NoBOM.GetBytes(effect.data.httppost_body);
 								http_fast.POST(effect.data.httppost_url, body, ContentType);
+								ServiceWrapper.ActivateBuzzer(250);
 							}
 							else
 								Logger.Info("Can't POST to Invalid URL: " + effect.data.httppost_url);
@@ -220,6 +225,7 @@ namespace HotkeyAutomation.HotkeyProcessing
 								break;
 							}
 							broadLink.SendCommandSync(effect.data.broadlink_commandName, effect.data.broadlink_repeatCount);
+							ServiceWrapper.ActivateBuzzer(250);
 							break;
 						}
 					case EffectType.iTach:
@@ -231,6 +237,7 @@ namespace HotkeyAutomation.HotkeyProcessing
 								break;
 							}
 							iTach.SendCommandSync(effect.data.itach_commandShortName, effect.data.itach_connectorAddress, effect.data.itach_repeatCount);
+							ServiceWrapper.ActivateBuzzer(250);
 							break;
 						}
 					case EffectType.Vera:
@@ -242,6 +249,7 @@ namespace HotkeyAutomation.HotkeyProcessing
 								break;
 							}
 							vera.Send(effect.data);
+							ServiceWrapper.ActivateBuzzer(250);
 							break;
 						}
 					case EffectType.HomeAssistant:
@@ -253,6 +261,7 @@ namespace HotkeyAutomation.HotkeyProcessing
 								break;
 							}
 							hassServer.CallService(effect.data.hass_entityid, effect.data.hass_method.Value, effect.data.hass_value);
+							ServiceWrapper.ActivateBuzzer(250);
 							break;
 						}
 					default:

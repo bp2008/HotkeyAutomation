@@ -20,10 +20,27 @@
 				<span v-show="!selectedFileIsZip">Zip File Only!</span>
 			</p>
 		</template>
+		<h2>Buzzer Configuration</h2>
+		<p>This software can be configured so that upon keypress, sound is emitted from an active buzzer attached to a GPIO pin.  Only tested on Raspberry PI.</p>
+		<p>If you set the GPIO number to a value greater than 0, we'll try to use a buzzer attached to that pin.</p>
+		<div v-if="buzzerCfg">
+			<div>
+				<label>Buzzer GPIO Number: <input type="number" min="0" max="30" v-model="buzzerCfg.buzzerGpioNumber" /></label>
+			</div>
+			<div>
+				<label><input type="checkbox" v-model="buzzerCfg.buzzerGpioOutputLowToBeep" /> Check this box if your buzzer is active when the GPIO output is "Low". Uncheck if "High".</label>
+			</div>
+			<div><input type="button" value="Save Buzzer Configuration" @click="saveBuzzerConfiguration()" /></div>
+		</div>
+		<div v-else-if="buzzerCfgError">Loading buzzer configuration...</div>
+		<div v-else>Loading buzzer configuration...</div>
+		<p><img :src="rpiPinoutImgUrl" style="width:640px;height:427px" /> <img :src="rpiPiezoBuzzerImgUrl" style="width:640px;height:444px" /></p>
 	</div>
 </template>
 
 <script>
+	import { ExecJSON } from 'appRoot/api/api.js';
+
 	export default {
 		components: {},
 		data()
@@ -31,8 +48,24 @@
 			return {
 				fileInputChangeCounter: 0,
 				uploadStatus: null,
-				uploadPercent: 0
+				uploadPercent: 0,
+				rpiPinoutImgUrl: appContext.appPath + "images/rpi-40-pin.png",
+				rpiPiezoBuzzerImgUrl: appContext.appPath + "images/rpi-piezo-buzzer.jpg",
+				buzzerCfg: null,
+				buzzerCfgError: null,
 			};
+		},
+		async created()
+		{
+			try
+			{
+				this.buzzerCfg = (await ExecJSON({ cmd: "get_buzzer_config" })).data;
+			}
+			catch (ex)
+			{
+				this.buzzerCfgError = ex.message;
+				toaster.error(ex);
+			}
 		},
 		computed:
 		{
@@ -101,6 +134,17 @@
 						// send POST request to server
 						request.send(data);
 					});
+			},
+			async saveBuzzerConfiguration()
+			{
+				try
+				{
+					await ExecJSON({ cmd: "set_buzzer_config", data: this.buzzerCfg });
+				}
+				catch (ex)
+				{
+					toaster.error(ex);
+				}
 			}
 		}
 	};

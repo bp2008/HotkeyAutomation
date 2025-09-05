@@ -15,12 +15,12 @@ using System.Security.Cryptography;
 using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Net;
+using static BPUtil.ByteUtil;
 
 namespace HotkeyAutomation
 {
 	public class WebServer : HttpServer
 	{
-		private static bool enableCaching = true;
 		private WebpackProxy webpackProxy = null;
 		public WebServer(X509Certificate2 cert = null) : base(SimpleCertificateSelector.FromCertificate(cert))
 		{
@@ -36,46 +36,41 @@ namespace HotkeyAutomation
 		public override void handleGETRequest(HttpProcessor p)
 		{
 			BasicEventTimer bet = new BasicEventTimer();
-			bet.Start("GET " + p.requestedPage);
+			bet.Start("GET " + p.Request.Page);
 			try
 			{
-				string pageLower = p.requestedPage.ToLower();
+				string pageLower = p.Request.Page.ToLower();
 				if (pageLower == "json")
 				{
-					p.writeFailure("405 Method Not Allowed", "json API requests must use the POST method");
+					p.Response.Simple("405 Method Not Allowed", "json API requests must use the POST method");
 				}
 				else if (pageLower == "broadlinkcommands.json")
 				{
 					if (File.Exists(ServiceWrapper.BroadLinkCommandsFile))
 					{
 						byte[] content = File.ReadAllBytes(ServiceWrapper.BroadLinkCommandsFile);
-						p.writeSuccess("application/json", content.Length);
-						p.outputStream.Flush();
-						p.tcpStream.Write(content, 0, content.Length);
+						p.Response.FullResponseUTF8(ByteUtil.Utf8NoBOM.GetString(content), "application/json");
 					}
 					else
-						p.writeFailure();
+						p.Response.Simple("404 Not Found");
 				}
 				else if (pageLower == "itachcommands.json")
 				{
 					if (File.Exists(ServiceWrapper.iTachCommandsFile))
 					{
 						byte[] content = File.ReadAllBytes(ServiceWrapper.iTachCommandsFile);
-						p.writeSuccess("application/json", content.Length);
-						p.outputStream.Flush();
-						p.tcpStream.Write(content, 0, content.Length);
+						p.Response.FullResponseUTF8(ByteUtil.Utf8NoBOM.GetString(content), "application/json");
 					}
 					else
-						p.writeFailure();
+						p.Response.Simple("404 Not Found");
 				}
 				else if (pageLower == "downloadconfiguration")
 				{
 					string filename = "HotkeyAutomationConfig_" + Environment.MachineName + "_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".zip";
-					HttpHeaderCollection additionalHeaders = new HttpHeaderCollection();
-					additionalHeaders.Add("Content-Disposition", "attachment; filename=\"" + filename + "\"");
-					p.writeSuccess("application/zip", additionalHeaders: additionalHeaders);
-					p.outputStream.Flush();
-					ConfigurationIO.WriteToStream(p.tcpStream);
+					p.Response.Headers.Add("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+					p.Response.ContentType = "application/zip";
+					Stream stream = p.Response.GetResponseStreamSync();
+					ConfigurationIO.WriteToStream(stream);
 				}
 				else
 				{
@@ -84,13 +79,13 @@ namespace HotkeyAutomation
 					string wwwDirectoryBase = WWWDirectory.FullName.Replace('\\', '/').TrimEnd('/') + '/';
 
 					FileInfo fi = null;
-					if (p.requestedPage == "")
+					if (p.Request.Page == "")
 						fi = GetDefaultFile(wwwDirectoryBase);
 					else
 					{
 						try
 						{
-							fi = new FileInfo(wwwDirectoryBase + p.requestedPage);
+							fi = new FileInfo(wwwDirectoryBase + p.Request.Page);
 						}
 						catch
 						{
@@ -100,7 +95,7 @@ namespace HotkeyAutomation
 					string targetFilePath = fi.FullName.Replace('\\', '/');
 					if (!targetFilePath.StartsWith(wwwDirectoryBase) || targetFilePath.Contains("../"))
 					{
-						p.writeFailure("400 Bad Request");
+						p.Response.Simple("400 Bad Request");
 						return;
 					}
 					if (webpackProxy != null)
@@ -123,7 +118,7 @@ namespace HotkeyAutomation
 						fi = GetDefaultFile(wwwDirectoryBase);
 						if (!fi.Exists)
 						{
-							p.writeFailure();
+							p.Response.Simple("404 Not Found");
 							return;
 						}
 					}
@@ -142,24 +137,17 @@ namespace HotkeyAutomation
 						{
 							Logger.Debug(ex);
 						}
-						p.writeSuccess(Mime.GetMimeType(fi.Extension));
-						p.outputStream.Write(html);
-						p.outputStream.Flush();
+						p.Response.FullResponseUTF8(html, Mime.GetMimeType(fi.Extension));
 					}
 					else
 					{
 						bet.Start("Write Response");
-						if (fi.LastWriteTimeUtc.ToString("R") == p.GetHeaderValue("if-modified-since"))
+						p.Response.StaticFile(fi.FullName);
+						if (fi.LastWriteTimeUtc.ToString("R") == p.Request.Headers.Get("if-modified-since"))
 						{
-							p.writeSuccess(Mime.GetMimeType(fi.Extension), -1, "304 Not Modified");
+							p.Response.ContentType = Mime.GetMimeType(fi.Extension);
+							p.Response.StatusString = "304 Not Modified";
 							return;
-						}
-						using (FileStream fs = fi.OpenRead())
-						{
-							p.writeSuccess(Mime.GetMimeType(fi.Extension), fi.Length, additionalHeaders: GetCacheLastModifiedHeaders(TimeSpan.FromHours(1), fi.LastWriteTimeUtc));
-							p.outputStream.Flush();
-							fs.CopyTo(p.tcpStream);
-							p.tcpStream.Flush();
 						}
 					}
 					#endregion
@@ -177,34 +165,14 @@ namespace HotkeyAutomation
 			return new FileInfo(wwwDirectoryBase + "Default.html");
 		}
 
-		private HttpHeaderCollection GetCacheEtagHeaders(TimeSpan maxAge, string etag)
-		{
-			HttpHeaderCollection additionalHeaders = new HttpHeaderCollection();
-			if (enableCaching)
-			{
-				additionalHeaders.Add(new KeyValuePair<string, string>("Cache-Control", "max-age=" + (long)maxAge.TotalSeconds + ", public"));
-				additionalHeaders.Add(new KeyValuePair<string, string>("ETag", etag));
-			}
-			return additionalHeaders;
-		}
-		private HttpHeaderCollection GetCacheLastModifiedHeaders(TimeSpan maxAge, DateTime lastModifiedUTC)
-		{
-			HttpHeaderCollection additionalHeaders = new HttpHeaderCollection();
-			if (enableCaching)
-			{
-				additionalHeaders.Add(new KeyValuePair<string, string>("Cache-Control", "max-age=" + (long)maxAge.TotalSeconds + ", public"));
-				additionalHeaders.Add(new KeyValuePair<string, string>("Last-Modified", lastModifiedUTC.ToString("R")));
-			}
-			return additionalHeaders;
-		}
-
 		public override void handlePOSTRequest(HttpProcessor p)
 		{
-			if (!ByteUtil.ReadToEndWithMaxLength(p.RequestBodyStream, 10 * 1024 * 1024, out byte[] data))
-				data = new byte[0];
+			ReadToEndResult bodyReadResult = ByteUtil.ReadToEndWithMaxLength(p.Request.RequestBodyStream, 10 * 1024 * 1024);
+			byte[] data = bodyReadResult.Data ?? new byte[0];
 
-			string pageLower = p.requestedPage.ToLower();
-			p.tcpClient.NoDelay = true;
+			p.GetTcpClient().NoDelay = true;
+
+			string pageLower = p.Request.Page.ToLower();
 			if (pageLower == "json")
 			{
 				JSONAPI.HandleRequest(p, ByteUtil.Utf8NoBOM.GetString(data));
@@ -214,8 +182,7 @@ namespace HotkeyAutomation
 				using (MemoryStream ms = new MemoryStream(data))
 				{
 					bool success = ConfigurationIO.ReadFromStream(ms);
-					p.writeSuccess("text/plain", 1);
-					p.outputStream.Write(success ? "1" : "0");
+					p.Response.FullResponseUTF8(success ? "1" : "0", "text/plain");
 					if (success)
 					{
 						Thread thrRestartSelf = new Thread(() =>

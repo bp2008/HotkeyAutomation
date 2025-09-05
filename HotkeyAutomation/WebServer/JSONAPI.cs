@@ -39,6 +39,35 @@ namespace HotkeyAutomation
 							response = new ResultLogGet("OK", nextLine, ServiceWrapper.logReader.readerId, lines);
 							break;
 						}
+					case "get_buzzer_config":
+						{
+							response = new ResultWithData(new
+							{
+								buzzerGpioNumber = ServiceWrapper.config.buzzerGpioNumber,
+								buzzerGpioOutputLowToBeep = ServiceWrapper.config.buzzerGpioOutputLowToBeep
+							});
+							break;
+						}
+					case "set_buzzer_config":
+						{
+							int buzzerGpioNumber = (int)requestObj.data.buzzerGpioNumber;
+							bool buzzerGpioOutputLowToBeep = requestObj.data.buzzerGpioOutputLowToBeep;
+							bool changed = false;
+							if (buzzerGpioNumber != ServiceWrapper.config.buzzerGpioNumber)
+							{
+								ServiceWrapper.config.buzzerGpioNumber = buzzerGpioNumber;
+								changed = true;
+							}
+							if (buzzerGpioOutputLowToBeep != ServiceWrapper.config.buzzerGpioOutputLowToBeep)
+							{
+								ServiceWrapper.config.buzzerGpioOutputLowToBeep = buzzerGpioOutputLowToBeep;
+								changed = true;
+							}
+							if (changed)
+								ServiceWrapper.config.Save();
+							response = new ResultSuccess();
+							break;
+						}
 					#region Hotkeys
 					case "hotkey_reorder":
 					case "hotkey_names":
@@ -345,9 +374,7 @@ namespace HotkeyAutomation
 			{
 				if (response == null)
 					response = new ResultFail() { error = "Application Error: A response was not generated, so this response was generated as a fallback." };
-				p.CompressResponseIfCompatible();
-				p.writeSuccess(jsonType);
-				p.outputStream.Write(JsonConvert.SerializeObject(response));
+				p.Response.FullResponseUTF8(JsonConvert.SerializeObject(response), jsonType);
 			}
 		}
 		private static object NamedItemAPI<T>(dynamic requestObj, NamedItemCollection<T> collection, Action saveCollection = null) where T : NamedItem, new()

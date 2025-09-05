@@ -8,6 +8,7 @@ using System.Threading;
 using BPUtil;
 using HotkeyAutomation.HotkeyProcessing;
 using HotkeyAutomation.iTach;
+using HotkeyAutomation.RpiGpio;
 
 namespace HotkeyAutomation
 {
@@ -28,8 +29,6 @@ namespace HotkeyAutomation
 			Logger.logType = LoggingMode.Console | LoggingMode.File;
 
 			Logger.CatchAll();
-
-			BPUtil.SimpleHttp.SimpleHttpLogger.RegisterLogger(Logger.httpLogger);
 
 			hotkeyManager = new HotkeyManager();
 
@@ -73,6 +72,7 @@ namespace HotkeyAutomation
 			}
 
 			httpServer = new WebServer();
+			httpServer.EnableLogging(false);
 			httpServer.SocketBound += HttpServer_SocketBound;
 		}
 
@@ -85,14 +85,62 @@ namespace HotkeyAutomation
 		public static void Start()
 		{
 			IsRunning = true;
-			Logger.StartLoggingThreads();
 			httpServer.SetBindings(config.httpPort);
 		}
 		public static void Stop()
 		{
 			IsRunning = false;
 			Try.Catch(() => { httpServer?.Stop(); });
-			Try.Catch(Logger.StopLoggingThreads);
 		}
+
+		#region Buzzer
+		/// <summary>
+		/// Buzzer may be null if not running on linux or if buzzer is not configured.  Always use null checking.
+		/// </summary>
+		private static Buzzer buzzer;
+		private static object buzzerLock = new object();
+		private static SetTimeout.TimeoutHandle buzzerTimeout;
+
+		/// <summary>
+		/// Activates the buzzer, if available, for the specified number of milliseconds.
+		/// </summary>
+		/// <param name="milliseconds">Milliseconds the buzzer should be activated for.</param>
+		public static void ActivateBuzzer(int milliseconds)
+		{
+			if (!Platform.IsUnix())
+				return;
+			lock (buzzerLock)
+			{
+				if (buzzer != null)
+				{
+					if (config.buzzerGpioNumber != buzzer.GpioNumber || config.buzzerGpioOutputLowToBeep != buzzer.outputHighToTurnOffSound)
+					{
+						buzzer.Dispose();
+						buzzer = new Buzzer(config.buzzerGpioNumber, config.buzzerGpioOutputLowToBeep);
+					}
+				}
+				else
+					buzzer = new Buzzer(config.buzzerGpioNumber, config.buzzerGpioOutputLowToBeep);
+
+				if (buzzerTimeout != null)
+				{
+					buzzerTimeout.Cancel();
+					buzzerTimeout = null;
+				}
+				buzzer.Active = true;
+				buzzerTimeout = SetTimeout.OnBackground(deactivateBuzzer, milliseconds, ex => Logger.Debug(ex));
+			}
+		}
+
+		private static void deactivateBuzzer()
+		{
+			lock (buzzerLock)
+			{
+				if (buzzerTimeout != null && buzzer != null)
+					buzzer.Active = false;
+				buzzerTimeout = null;
+			}
+		}
+		#endregion
 	}
 }

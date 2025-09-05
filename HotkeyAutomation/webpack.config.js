@@ -43,7 +43,8 @@ module.exports =
 	output: {
 		path: path.resolve(__dirname, "www/dist"),
 		filename: 'bundle.js',
-		publicPath: '/dist/'
+		publicPath: '/dist/',
+		hashFunction: 'sha256'
 	},
 	module: {
 		rules: [

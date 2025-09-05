@@ -18,6 +18,14 @@ namespace HotkeyAutomation
 		public string systemName = "HotkeyAutomation";
 		public int httpPort = 80;
 		public bool devMode = false;
+		/// <summary>
+		/// If greater than 0, we'll try to operate an active buzzer on this GPIO number.
+		/// </summary>
+		public int buzzerGpioNumber = 0;
+		/// <summary>
+		/// If true, we set the GPIO output to "Low" to make the buzzer make noise.  If false, we set the GPIO output to "High" to make the buzzer make noise.
+		/// </summary>
+		public bool buzzerGpioOutputLowToBeep = true;
 
 		public string GetWWWDirectoryBase()
 		{

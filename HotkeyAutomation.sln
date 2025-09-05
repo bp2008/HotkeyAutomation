@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28729.10
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197 d17.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotkeyAutomation", "HotkeyAutomation\HotkeyAutomation.csproj", "{0E132A64-B944-466F-81FE-C6E1CE565262}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BPUtil", "..\BPUtil\BPUtil\BPUtil.csproj", "{A4981D8D-DEBF-4B34-B9CE-FF25520A02B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Broadlink.Net.Framework", "..\broadlink-dotnet\Broadlink.Net.Framework\Broadlink.Net.Framework.csproj", "{084B86E2-77F9-42C0-BF04-4D25B1F99179}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Broadlink.Net.Framework", "broadlink-dotnet\Broadlink.Net.Framework\Broadlink.Net.Framework.csproj", "{084B86E2-77F9-42C0-BF04-4D25B1F99179}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HADotNet.Core", "HADotNet.Core\HADotNet.Core.csproj", "{D7D36F6B-8D7E-4717-8788-3A78DA71D96F}"
 EndProject
