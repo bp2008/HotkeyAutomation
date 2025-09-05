@@ -31,8 +31,8 @@ This application is currently not set up to handle browser caching properly.  If
 
 Built with Visual Studio 2022 (community edition).
 
-Required dependencies:
-  https://github.com/bp2008/broadlink-dotnet
-  https://github.com/bp2008/BPUtil
+Required dependencies:  
+  https://github.com/bp2008/broadlink-dotnet  
+  https://github.com/bp2008/BPUtil  
 
 Requires node.js.  After installing node.js, run `npm install` in the HotkeyAutomation project directory, or run the `Z_NpmInstall.bat` file.  Npm install must be run after updating the npm package list in package.json.
