@@ -109,6 +109,8 @@ namespace HotkeyAutomation
 		{
 			if (!Platform.IsUnix())
 				return;
+			if (config.buzzerGpioNumber <= 0)
+				return;
 			lock (buzzerLock)
 			{
 				if (buzzer != null)
