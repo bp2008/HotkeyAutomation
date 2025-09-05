@@ -35,4 +35,4 @@ Required dependencies:
   https://github.com/bp2008/broadlink-dotnet  
   https://github.com/bp2008/BPUtil  
 
-Requires node.js.  After installing node.js, run `npm install` in the HotkeyAutomation project directory, or run the `Z_NpmInstall.bat` file.  Npm install must be run after updating the npm package list in package.json.
+Requires node.js.  After installing node.js, run `npm install` in the HotkeyAutomation project directory, or run the `Z_NpmInstall.bat` file.  Npm install must be run in fresh development environments and after updating the npm package list in package.json.
